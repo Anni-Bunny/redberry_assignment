@@ -3,30 +3,30 @@ import {High} from "../assets/icons/High.tsx";
 import {Low} from "../assets/icons/Low.tsx";
 
 const priorityTypes = {
-    medium: {
+    1: {
+        mainDivClassName: 'border-[#08A508] rounded-[5px]',
+        icon: <Low/>,
+        priority: 'დაბალი',
+        priorityClassname: 'text-[#08A508]'
+    },
+    2: {
         mainDivClassName: 'border-[#FFBE0B] rounded-sm',
         icon: <Medium/>,
         priority: 'საშუალო',
         priorityClassname: 'text-[#FFBE0B]'
     },
-    high: {
+    3: {
         mainDivClassName: 'border-[#FA4D4D] rounded-[5px]',
         icon: <High/>,
         priority: 'მაღალი',
         priorityClassname: 'text-[#FA4D4D]'
-    },
-    low: {
-        mainDivClassName: 'border-[#08A508] rounded-[5px]',
-        icon: <Low/>,
-        priority: 'დაბალი',
-        priorityClassname: 'text-[#08A508]'
     }
 }
 
 export type priorityType = keyof typeof priorityTypes;
 
 
-export function TaskPriority({type}: { type: priorityType }) {
+export function TaskPriority({type = 2}: { type: priorityType }) {
 
     const selectedType = priorityTypes[type];
 
