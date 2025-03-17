@@ -40,10 +40,10 @@ export function Dropdown({
     }, []);
 
     return (
-        <span className={`flex relative w-full items-center justify-center ${mainDivClassName}`} ref={dropdownRef}>
+        <span className={`flex relative items-center justify-center ${mainDivClassName}`} ref={dropdownRef}>
             <button className={`relative cursor-pointer flex gap-2 ${titleClassName}`} onClick={toggleDropdown}>{title} {icon}</button>
             <div
-                className={`w-[688px] rounded-[10px] bottom-[-21px] absolute translate-y-full z-10 ${isVisible ? '' : 'hidden'} bg-white border-[0.5px] border-[#8338EC] transition duration-400 pt-10 pb-5 px-[30px] flex flex-col gap-[25px] ${childClassName}`}>
+                className={`bottom-[-21px] absolute translate-y-full z-10 ${isVisible ? '' : 'hidden'} bg-white border-[0.5px] transition duration-400 flex flex-col ${childClassName}`}>
                 {children}
             </div>
         </span>
