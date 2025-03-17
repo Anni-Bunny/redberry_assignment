@@ -1,6 +1,7 @@
 import {TaskCard} from "./TaskCard.tsx";
 import {Task} from "../interfaces/Task.ts";
 import {Status} from "../interfaces/Status.ts";
+import {Link} from "react-router-dom";
 
 const statusColors = ['bg-[#3A86FF]', 'bg-[#F7BC30]', 'bg-[#FB5607]', 'bg-[#FF006E]']
 
@@ -18,7 +19,10 @@ export function StatusColumn({status, tasks}: { status: Status, tasks: Task[] })
             </div>
 
             {
-                tasks && tasks.map((task) => task.status.id === status.id && <TaskCard key={'task_' + task.id} task={task}/>)
+                tasks && tasks.map((task) => task.status.id === status.id &&
+                    <Link to={"/tasks/" + task.id} key={task.id}>
+                        <TaskCard key={'task_' + task.id} task={task}/>
+                    </Link>)
             }
         </div>
     );
