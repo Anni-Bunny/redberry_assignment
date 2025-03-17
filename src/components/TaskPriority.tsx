@@ -26,12 +26,12 @@ const priorityTypes = {
 export type priorityType = keyof typeof priorityTypes;
 
 
-export function TaskPriority({type = 2}: { type: priorityType }) {
+export function TaskPriority({type = 2, classname}: { type: priorityType, classname?: string }) {
 
     const selectedType = priorityTypes[type];
 
     return (
-        <div className={`${selectedType.mainDivClassName} w-[86px] h-[26px] border-[0.5px] p-1 flex gap-1`}>
+        <div className={`${selectedType.mainDivClassName} ${classname} w-[86px] h-[26px] border-[0.5px] p-1 flex gap-1 items-center justify-center`}>
             <div>{selectedType.icon}</div>
             <p className={`text-xs leading-[150%] font-medium ${selectedType.priorityClassname}`}>{selectedType.priority}</p>
         </div>
