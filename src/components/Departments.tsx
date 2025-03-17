@@ -10,12 +10,12 @@ const depColors = [
     'bg-[#FFD86D]'
 ]
 
-export function Departments({department}: { department: Department }) {
+export function Departments({department, classname}: { department: Department, classname?: string}) {
 
     const selectedColor = depColors[department.id % depColors.length]
 
     return (
-        <div className={` text-nowrap overflow-hidden text-ellipsis w-[88px] h-6 rounded-[15px] py-[5px] px-[9px] text-white font-normal text-xs items-center justify-center ${selectedColor}`}>
+        <div className={`${classname} text-nowrap overflow-hidden text-ellipsis w-[88px] h-6 rounded-[15px] py-[5px] px-[9px] text-white font-normal text-xs items-center justify-center ${selectedColor}`}>
             {department.name}
         </div>
     );
