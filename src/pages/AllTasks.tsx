@@ -31,8 +31,8 @@ export const AllTasks = () => {
 
                 <div
                     className='w-[688px] h-11 border border-[#DEE2E6] rounded-[10px] mt-[52px] flex gap-[45px] justify-between items-center'>
-                    <Dropdown title={'დეპარტამენტი'} icon={<ChevronArrowDown/>} childClassName='left-0'/>
-                    <Dropdown title={'პრიორიტეტი'} icon={<ChevronArrowDown/>}>
+                    <Dropdown title={'დეპარტამენტი'} icon={<ChevronArrowDown/>} childClassName='left-0 w-[688px] rounded-[10px] border-[#8338EC] pt-10 pb-5 px-[30px] gap-[25px]' mainDivClassName='w-full'/>
+                    <Dropdown title={'პრიორიტეტი'} icon={<ChevronArrowDown/>} mainDivClassName='w-full' childClassName='w-[688px] rounded-[10px] border-[#8338EC] pt-10 pb-5 px-[30px] gap-[25px]'>
 
                         <div>
                             <div className='flex flex-col gap-[22px]'>
@@ -55,7 +55,7 @@ export const AllTasks = () => {
                         </div>
 
                     </Dropdown>
-                    <Dropdown title={'თანამშრომელი'} icon={<ChevronArrowDown/>} childClassName='right-0'/>
+                    <Dropdown title={'თანამშრომელი'} icon={<ChevronArrowDown/>} childClassName='right-0 w-[688px] rounded-[10px] border-[#8338EC] pt-10 pb-5 px-[30px] gap-[25px]' mainDivClassName='w-full'/>
                 </div>
 
                 <div className='flex w-full justify-between items-start mt-[79px] gap-[52px]'>
