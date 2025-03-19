@@ -3,11 +3,14 @@ import {TaskPriority} from "./TaskPriority.tsx";
 import {Departments} from "./Departments.tsx";
 import {Comment} from "../assets/icons/Comment.tsx";
 import {Task} from "../interfaces/Task.ts";
+import { format } from 'date-fns';
 
 const borderColors = ['border-[#3A86FF]', 'border-[#F7BC30]', 'border-[#FB5607]', 'border-[#FF006E]']
 
 
 export function TaskCard({task}: {task: Task }) {
+    const formattedDate = format(new Date(task.due_date), "dd MMM, yyyy");
+
     return (
         <Card className={`${borderColors[(task.status.id % borderColors.length)]}`}>
             <div className='h-[26px] w-[341px] flex justify-between'>
@@ -17,7 +20,9 @@ export function TaskCard({task}: {task: Task }) {
                 </div>
 
                 <span
-                    className='font-normal text-xs w-[76px] h-[]14px flex items-center justify-end text-[#212529]'>{task.due_date}</span>
+                    className='font-normal text-xs w-[76px] h-[]14px flex items-center justify-end text-[#212529]'>
+                    {formattedDate}
+                </span>
             </div>
 
             <div className='w-80 h-16 flex flex-col gap-3'>

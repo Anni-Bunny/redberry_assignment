@@ -12,6 +12,7 @@ import {Calendar} from "../assets/icons/Calendar.tsx";
 import {ChevronArrowDown} from "../assets/icons/ChevronArrowDown.tsx";
 import {CheckBox} from "../components/Checkbox.tsx";
 import {LeftArrow} from "../assets/icons/LeftArrow.tsx";
+import {format} from "date-fns";
 
 export function SingleTask() {
     const {id} = useParams()
@@ -93,7 +94,7 @@ export function SingleTask() {
                                         <span>დავალების ვადა</span>
                                     </div>
                                     <div>
-                                        {task.due_date}
+                                        {format(new Date(task.due_date), "dd MMM, yyyy")}
                                     </div>
                                 </div>
                             </div>

@@ -3,6 +3,10 @@ import {AllTasks} from "./pages/AllTasks.tsx";
 import {Header} from "./components/Header.tsx";
 import {SingleTask} from "./pages/SingleTask.tsx";
 import {CreateNewTask} from "./pages/CreateNewTask.tsx";
+import { setDefaultOptions  } from 'date-fns/setDefaultOptions';
+import { ka } from 'date-fns/locale';
+
+setDefaultOptions( { locale: ka })
 
 function App() {
     return (
