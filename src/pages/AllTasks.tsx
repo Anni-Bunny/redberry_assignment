@@ -74,23 +74,6 @@ export const AllTasks = () => {
         localStorage.setItem('filters', JSON.stringify(filters));
     }, [filters]);
 
-    function HandleUpdateMainFilter() {
-        let updatedEmployees = selectedEmployee
-
-        // Filter employees by departments
-       if (selectedEmployee && selectedDepartments.length && !depChecked(selectedEmployee.department.id)) {
-           updatedEmployees = null
-           setSelectedEmployee(null);
-       }
-
-        // Use the updated employees in setFilters
-        setFilters({
-            departments: selectedDepartments,
-            priorities: selectedPriorities,
-            employee: updatedEmployees, // Use the filtered version here
-        });
-    }
-
     function handleClickOutside(type: string) {
         switch (type) {
             case "department":
@@ -131,14 +114,31 @@ export const AllTasks = () => {
 
     function handleToggleDepatrment(department: Department) {
         if (depChecked(department.id)) {
-            setSelectedDepartments((oldSelectedDeps) => {
-                return oldSelectedDeps.filter(dep => dep.id !== department.id)
-            })
+            const newSelectedDepartments = selectedDepartments.filter(dep => dep.id !== department.id)
+            setSelectedDepartments(newSelectedDepartments)
+            return newSelectedDepartments
         } else {
-            setSelectedDepartments((oldSelectedDeps) => {
-                return [...oldSelectedDeps, department]
-            })
+            const newSelectedDepartments = [...selectedDepartments, department]
+            setSelectedDepartments(newSelectedDepartments)
+            return newSelectedDepartments
         }
+    }
+
+    function handleFilterByDepartments(departments?: Department[]) {
+        let updatedEmployee = selectedEmployee
+        const updatedDepartments = departments ?? selectedDepartments
+
+        // Filter employees by departments
+        if (updatedEmployee && updatedDepartments.length && !depChecked(updatedEmployee.department.id)) {
+            updatedEmployee = null
+            setSelectedEmployee(null);
+        }
+
+        setFilters({
+            priorities: filters.priorities,
+            departments: updatedDepartments,
+            employee: updatedEmployee
+        });
     }
 
     const depChecked = useCallback((id: number) => {
@@ -149,14 +149,21 @@ export const AllTasks = () => {
 
     function handleTogglePriority(priority: Priority) {
         if (priorityChecked(priority.id)) {
-            setSelectedPriorities((oldSelectedPriorities) => {
-                return oldSelectedPriorities.filter(prio => prio.id !== priority.id);
-            });
+            const newSelectedPriorities = selectedPriorities.filter(prio => prio.id !== priority.id)
+            setSelectedPriorities(newSelectedPriorities);
+            return newSelectedPriorities
         } else {
-            setSelectedPriorities((oldSelectedPriorities) => {
-                return [...oldSelectedPriorities, priority];
-            });
+            const newSelectedPriorities = [...selectedPriorities, priority]
+            setSelectedPriorities(newSelectedPriorities);
+            return newSelectedPriorities
         }
+    }
+
+    function handleFilterByPriorities(priorities?: Priority[]) {
+        setFilters({
+            ...filters,
+            priorities: priorities ?? selectedPriorities,
+        });
     }
 
     const priorityChecked = useCallback((id: number) => {
@@ -177,6 +184,13 @@ export const AllTasks = () => {
     const employeeChecked = useCallback((id: number) => {
         return selectedEmployee?.id === id;
     }, [selectedEmployee]);
+
+    function HandleFilterByEmployee(employee?:Employee|null) {
+        setFilters({
+            ...filters,
+            employee: employee === null ? employee : selectedEmployee
+        });
+    }
 
     return (
         <Container>
@@ -199,7 +213,7 @@ export const AllTasks = () => {
                             ))}
                         </div>
                         <div className='flex justify-end'>
-                            <button onClick={HandleUpdateMainFilter}
+                            <button onClick={() => handleFilterByDepartments()}
                                     className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
                             </button>
                         </div>
@@ -217,7 +231,7 @@ export const AllTasks = () => {
                             ))}
                         </div>
                         <div className='flex justify-end'>
-                            <button onClick={HandleUpdateMainFilter}
+                            <button onClick={() => handleFilterByPriorities()}
                                     className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
                             </button>
                         </div>
@@ -237,7 +251,7 @@ export const AllTasks = () => {
                             ))}
                         </div>
                         <div className='flex justify-end'>
-                            <button onClick={HandleUpdateMainFilter}
+                            <button onClick={() => HandleFilterByEmployee()}
                                     className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
                             </button>
                         </div>
@@ -250,8 +264,7 @@ export const AllTasks = () => {
                             key={`filter_departments_${item.id}`}
                             label={item.name}
                             onRemove={() => {
-                                handleToggleDepatrment(item);
-                                HandleUpdateMainFilter();
+                                handleFilterByDepartments(handleToggleDepatrment(item));
                             }}
                         />
                     ))}
@@ -261,8 +274,7 @@ export const AllTasks = () => {
                             key={`filter_priorities_${item.id}`}
                             label={item.name}
                             onRemove={() => {
-                                handleTogglePriority(item);
-                                HandleUpdateMainFilter();
+                                handleFilterByPriorities(handleTogglePriority(item))
                             }}
                         />
                     ))}
@@ -272,13 +284,13 @@ export const AllTasks = () => {
                             label={filters.employee.name}
                             onRemove={() => {
                                 setSelectedEmployee(null);
-                                HandleUpdateMainFilter();
+                                HandleFilterByEmployee(null);
                             }}
                         />
                     }
 
                     {
-                       !!(filters.departments.length || filters.employee || filters.priorities.length) &&
+                        !!(filters.departments.length || filters.employee || filters.priorities.length) &&
                         <span className="text-sm items-center flex px-[10px] py-[6px] text-[#343A40] cursor-pointer" onClick={clearAllFilters}>გასუფთავება</span>
                     }
                 </div>
