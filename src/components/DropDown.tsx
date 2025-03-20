@@ -6,7 +6,8 @@ interface dropdownProps {
     children?: React.ReactNode,
     childClassName?: string,
     mainDivClassName?: string
-    titleClassName?: string
+    titleClassName?: string,
+    outsideClickCallback?: () => void
 }
 
 export function Dropdown({
@@ -15,7 +16,8 @@ export function Dropdown({
                              children,
                              childClassName,
                              mainDivClassName,
-                             titleClassName
+                             titleClassName,
+                             outsideClickCallback
                          }: dropdownProps) {
     const [isVisible, setIsVisible] = useState(false);
 
@@ -27,7 +29,10 @@ export function Dropdown({
 
     const handleClickOutside = (event: MouseEvent) => {
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
-            setIsVisible(false); 
+            setIsVisible(false);
+
+            if (outsideClickCallback)
+                outsideClickCallback()
         }
     };
 
