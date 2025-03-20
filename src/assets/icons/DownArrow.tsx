@@ -1,0 +1,10 @@
+export const DownArrow = ({className}: { className?: string }) => {
+    return (
+        <svg className={className} width="14" height="14" viewBox="0 0 14 14" fill="none"
+             xmlns="http://www.w3.org/2000/svg">
+            <path d="M11.6199 5.22095L7.81655 9.02428C7.36738 9.47345 6.63238 9.47345 6.18322 9.02428L2.37988 5.22095"
+                  stroke="#343A40" strokeWidth="1.5" strokeMiterlimit="10" strokeLinecap="round"
+                  strokeLinejoin="round"/>
+        </svg>
+    );
+};

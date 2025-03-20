@@ -1,8 +1,11 @@
 import {Input, Dialog, Field, Label, Transition, Select} from '@headlessui/react'
-import {Fragment} from 'react'
+import {Fragment, useState} from 'react'
 import {Cancel} from "../assets/icons/Cancel.tsx";
 import {Asterisk} from "../assets/icons/Asterisk.tsx";
 import {Check} from "../assets/icons/Check.tsx";
+import {useDropzone} from "react-dropzone";
+import {Trash} from "../assets/icons/Trash.tsx";
+import {DownArrow} from "../assets/icons/DownArrow.tsx";
 
 
 interface ModalProps {
@@ -11,6 +14,33 @@ interface ModalProps {
 }
 
 export default function Modal({isOpen, closeModal}: ModalProps) {
+
+    const [imagePreview, setImagePreview] = useState<string | null>(null);
+
+    const {
+        getRootProps,
+        getInputProps
+    } = useDropzone({
+        accept: {
+            'image/jpeg': [],
+            'image/png': []
+        },
+        maxFiles: 1, // Limit to 1 file
+        onDrop: (acceptedFiles) => {
+            // Show preview of the uploaded image
+            const file = acceptedFiles[0];
+            if (file) {
+                const objectUrl = URL.createObjectURL(file);
+                setImagePreview(objectUrl);
+            }
+        }
+    });
+
+
+    const handleImageRemove = () => {
+        setImagePreview(null);
+    };
+
     return (
         <Dialog open={isOpen} as="div" className="relative z-10" onClose={closeModal}>
             <Transition.Child
@@ -89,31 +119,69 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                     </div>
 
                                     <div>
-                                        
+                                        <label className="text-sm/6 font-medium text-[#343A40] flex">
+                                            ავატარი <Asterisk className="mt-[3px]"/>
+                                        </label>
+                                        <div
+                                            className="dropzone h-[120px] flex flex-col items-center justify-center border border-dashed border-[#CED4DA]" {...getRootProps()}>
+                                            <input required={true} {...getInputProps()} />
+                                            {imagePreview ? (
+                                                <div className="relative">
+                                                    <img src={imagePreview} alt="Preview"
+                                                         className="rounded-full w-[88px] h-[88px] object-cover"/>
+                                                    <button
+                                                        onClick={(e) => {
+                                                            e.stopPropagation()
+                                                            handleImageRemove()
+                                                        }} // Remove image when clicked
+                                                        className="cursor-pointer w-[24px] h-[24px] overflow-hidden flex items-center justify-center rounded-full bg-white border border-[#6C757D] absolute bottom-[3px] right-[3px]">
+                                                        <Trash/>
+                                                    </button>
+                                                </div>
+                                            ) : <>
+                                                <p>Drag 'n' drop some files here, or click to select files</p>
+                                                <em>(Only *.jpeg and *.png images will be accepted)</em>
+                                            </>}
+                                        </div>
+
                                     </div>
 
                                     <Field className="flex flex-col">
                                         <Label className="text-sm/6 font-medium text-[#343A40] flex">
                                             დეპარტამენტი <Asterisk className="mt-[3px]"/>
                                         </Label>
-                                        <Select
-                                            value={'22'}
-                                            className=" text-sm w-[384px] rounded-[5px] border border-[#DEE2E6] p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none">
-                                            <option className="text-sm" value="active">Active</option>
-                                            <option className="text-sm" value="22">22</option>
-                                        </Select>
+                                        <div className="relative w-fit ">
+                                            <Select
+                                                className={'cursor-pointer text-sm w-[384px] rounded-[5px] border border-[#DEE2E6] p-[14px] h-[45px] appearance-none '}
+                                            >
+                                                <option className="text-sm" value="active">Active</option>
+                                                <option className="text-sm" value="22">22</option>
+                                            </Select>
+                                            <DownArrow
+                                                className="group pointer-events-none absolute top-[14px] right-[14px]"
+                                                aria-hidden="true"
+                                            />
+                                        </div>
                                     </Field>
 
                                 </div>
                             </div>
 
-                            <div className="mt-4">
+                            <div className="flex justify-end gap-[22px]">
                                 <button
                                     type="button"
-                                    className="inline-flex justify-center rounded-md border border-transparent bg-blue-100 px-4 py-2 text-sm font-medium text-blue-900 hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                                    className="inline-flex justify-center rounded-md border border-[#8338EC]  px-4 py-2 text-sm font-medium text-[#343A40] cursor-pointer"
                                     onClick={closeModal}
                                 >
-                                    Got it, thanks!
+                                    გაუქმება
+                                </button>
+
+                                <button
+                                    type="button"
+                                    className="inline-flex justify-center rounded-md border border-transparent bg-[#8338EC]  px-4 py-2 text-sm font-medium text-white cursor-pointer"
+                                    onClick={closeModal}
+                                >
+                                    დაამატე თანამშრომელი
                                 </button>
                             </div>
                         </Dialog.Panel>
