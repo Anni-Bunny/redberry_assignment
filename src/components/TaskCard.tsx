@@ -31,7 +31,7 @@ export function TaskCard({task}: {task: Task }) {
             </div>
 
             <div className='h-[31px] flex justify-between w-full items-center'>
-                <img src={task.employee.avatar} alt="img" className='w-[31px]'/>
+                <img src={task.employee.avatar} alt={task.employee.name} className='w-[31px] h-[31px] rounded-full'/>
                 <div className='flex gap-[2.5px]'>
                     <Comment/>
                     <p>{task.total_comments}</p>
