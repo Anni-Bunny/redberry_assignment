@@ -31,7 +31,7 @@ export function Dropdown({
         if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
             setIsVisible(false);
 
-            if (outsideClickCallback)
+            if (outsideClickCallback && isVisible)
                 outsideClickCallback()
         }
     };
