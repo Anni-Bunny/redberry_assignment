@@ -72,19 +72,17 @@ export const AllTasks = () => {
     }, [filters]);
 
     function HandleUpdateMainFilter() {
+        // Filter employees by departments
+        const updatedEmployees = selectedEmployees.filter(employee => depChecked(employee.department.id));
 
-        // filter employees by departments
-        setSelectedEmployees((selectedEmployees) =>
-            selectedEmployees.filter(employee => depChecked(employee.department.id)
-            ))
+        // Set the filtered employees and then update the filters
+        setSelectedEmployees(updatedEmployees);
 
-        setFilters(() => {
-
-            return {
-                departments: selectedDepartments,
-                priorities: selectedPriorities,
-                employees: selectedEmployees
-            };
+        // Use the updated employees in setFilters
+        setFilters({
+            departments: selectedDepartments,
+            priorities: selectedPriorities,
+            employees: updatedEmployees, // Use the filtered version here
         });
     }
 
