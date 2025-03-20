@@ -21,14 +21,12 @@ interface AllTasksFilter {
 
 export const AllTasks = () => {
     const [tasks, setTasks] = useState<Task[]>([])
-    const [filteredTasks, setFilteredTasks] = useState<Task[]>([])
 
     const [statuses, setStatuses] = useState<Status[]>([])
     const [departments, setDepartments] = useState<Department[]>([])
     const [priorities, setPriorities] = useState<Priority[]>([])
 
     const [employees, setEmployees] = useState<Employee[]>([])
-    // const [filteredEmployees, setFilteredEmployees] = useState<Employee[]>([])
 
     const storedFilters = JSON.parse(localStorage.getItem('filters') as string) || {
         departments: [],
@@ -44,8 +42,8 @@ export const AllTasks = () => {
     const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>(filters.priorities);
     const [selectedEmployees, setSelectedEmployees] = useState<Employee[]>(filters.employees);
 
+    //requests
     useEffect(() => {
-        console.log('effect')
         api.getStatuses().then(function (res) {
             setStatuses(res.data)
         })
@@ -68,6 +66,43 @@ export const AllTasks = () => {
 
     }, []);
 
+    // main filter
+    useEffect(() => {
+        localStorage.setItem('filters', JSON.stringify(filters));
+    }, [filters]);
+
+    function HandleUpdateMainFilter() {
+
+        // filter employees by departments
+        setSelectedEmployees((selectedEmployees) =>
+            selectedEmployees.filter(employee => depChecked(employee.department.id)
+            ))
+
+        setFilters(() => {
+
+            return {
+                departments: selectedDepartments,
+                priorities: selectedPriorities,
+                employees: selectedEmployees
+            };
+        });
+    }
+
+    function handleClickOutside(type: string) {
+        switch (type) {
+            case "department":
+                setSelectedDepartments(() => filters.departments)
+                break
+            case "employee":
+                setSelectedEmployees(() => filters.employees)
+                break
+            case "priority":
+                setSelectedPriorities(() => filters.priorities)
+                break
+        }
+    }
+
+    // tasks
     function filterTasks(tasks: Task[]) {
         return tasks.filter(task => {
             const isDepartmentMatch = filters.departments.length === 0 || filters.departments.find(item => item.id === task.department.id);
@@ -78,33 +113,13 @@ export const AllTasks = () => {
         })
     }
 
-    function filterEmployees(employees: Employee[]) {
-        return employees.filter(emp => filters.departments.length === 0 || filters.departments.find(dep => dep.id === emp.department.id))
-    }
+    const filteredTasks = useMemo(() => {
+        return filterTasks(tasks)
+    }, [tasks]);
 
+    // department
 
-    useEffect(() => {
-        localStorage.setItem('filters', JSON.stringify(filters));
-
-        setFilteredTasks(filterTasks(tasks))
-
-    }, [filters, tasks]);
-
-    const filteredEmployees = useMemo(() => {
-        return filterEmployees(employees)
-    }, [filters.departments, employees]);
-
-    function HandleUpdateMainFilter() {
-        setFilters(() => {
-            return {
-                departments:selectedDepartments,
-                priorities:selectedPriorities,
-                employees:selectedEmployees
-            };
-        });
-    }
-
-    function handleSelectDepatrment(department:Department) {
+    function handleSelectDepatrment(department: Department) {
         if (depChecked(department.id)) {
             setSelectedDepartments((oldSelectedDeps) => {
                 return oldSelectedDeps.filter(dep => dep.id !== department.id)
@@ -116,25 +131,65 @@ export const AllTasks = () => {
         }
     }
 
-    function handleClickOutside() {
-        setSelectedDepartments(filters.departments)
-        setSelectedEmployees(filters.employees)
-        setSelectedPriorities(filters.priorities)
-    }
-
-    const depChecked = useCallback((id:number) => {
+    const depChecked = useCallback((id: number) => {
         return !!selectedDepartments?.find(dep => dep.id === id)
     }, [selectedDepartments]);
+
+    // priority
+
+    function handleSelectPriority(priority: Priority) {
+        if (priorityChecked(priority.id)) {
+            setSelectedPriorities((oldSelectedPriorities) => {
+                return oldSelectedPriorities.filter(prio => prio.id !== priority.id);
+            });
+        } else {
+            setSelectedPriorities((oldSelectedPriorities) => {
+                return [...oldSelectedPriorities, priority];
+            });
+        }
+    }
+
+    const priorityChecked = useCallback((id: number) => {
+        return !!selectedPriorities?.find(prio => prio.id === id);
+    }, [selectedPriorities]);
+
+
+    // employee
+
+    function filterEmployees(employees: Employee[]) {
+        return employees.filter(emp => filters.departments.length === 0 || filters.departments.find(dep => dep.id === emp.department.id))
+    }
+
+    const filteredEmployees = useMemo(() => {
+        return filterEmployees(employees)
+    }, [filters.departments, employees]);
+
+    function handleSelectEmployee(employee: Employee) {
+        if (employeeChecked(employee.id)) {
+            setSelectedEmployees((oldSelectedEmployees) => {
+                return oldSelectedEmployees.filter(emp => emp.id !== employee.id);
+            });
+        } else {
+            setSelectedEmployees((oldSelectedEmployees) => {
+                return [...oldSelectedEmployees, employee];
+            });
+        }
+    }
+
+    const employeeChecked = useCallback((id: number) => {
+        return !!selectedEmployees?.find(emp => emp.id === id);
+    }, [selectedEmployees]);
 
     return (
         <Container>
             <div className='flex flex-col'>
                 <h1 className='text-[34px] font-semibold mt-10'>დავალებების გვერდი</h1>
 
-                <div className='w-[688px] h-11 border border-[#DEE2E6] rounded-[10px] mt-[52px] flex gap-[45px] justify-between items-center'>
+                <div
+                    className='w-[688px] h-11 border border-[#DEE2E6] rounded-[10px] mt-[52px] flex gap-[45px] justify-between items-center'>
 
                     <Dropdown title={'დეპარტამენტი'} icon={<ChevronArrowDown/>}
-                              outsideClickCallback={handleClickOutside}
+                              outsideClickCallback={() => handleClickOutside('department')}
                               childClassName='left-0 w-[688px] rounded-[10px] border-[#8338EC] pt-10 pb-5 px-[30px] gap-[25px]'
                               mainDivClassName='w-full'>
                         <div className='flex flex-col gap-[22px]'>
@@ -142,41 +197,50 @@ export const AllTasks = () => {
                                 <CheckBox checked={depChecked(department.id)}
                                           onChange={() => handleSelectDepatrment(department)}
                                           key={`department_${department.id}`}
-                                         label={department.name}/>
+                                          label={department.name}/>
                             ))}
                         </div>
                         <div className='flex justify-end'>
                             <button onClick={HandleUpdateMainFilter}
-                                className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
+                                    className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
                             </button>
                         </div>
                     </Dropdown>
 
                     <Dropdown title={'პრიორიტეტი'} icon={<ChevronArrowDown/>} mainDivClassName='w-full'
+                              outsideClickCallback={() => handleClickOutside('priority')}
                               childClassName='w-[688px] rounded-[10px] border-[#8338EC] pt-10 pb-5 px-[30px] gap-[25px]'>
-
                         <div className='flex flex-col gap-[22px]'>
-                            {priorities.map(priority => <CheckBox key={`priority_${priority.id}`}
-                                                                  label={priority.name}/>)}
+                            {priorities.map(priority => (
+                                <CheckBox checked={priorityChecked(priority.id)}
+                                          onChange={() => handleSelectPriority(priority)}
+                                          key={`priority_${priority.id}`}
+                                          label={priority.name}/>
+                            ))}
                         </div>
                         <div className='flex justify-end'>
-                            <button
-                                className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
+                            <button onClick={HandleUpdateMainFilter}
+                                    className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
                             </button>
                         </div>
-
                     </Dropdown>
+
                     <Dropdown title={'თანამშრომელი'} icon={<ChevronArrowDown/>}
+                              outsideClickCallback={() => handleClickOutside('employee')}
                               childClassName='right-0 w-[688px] rounded-[10px] border-[#8338EC] pt-10 pb-5 px-[30px] gap-[25px]'
                               mainDivClassName='w-full'>
                         <div className='flex flex-col gap-[22px]'>
-                            {filteredEmployees.map(employee => <CheckBox key={`employee_${employee.id}`}
-                                                                         image={employee.avatar}
-                                                                         label={employee.name}/>)}
+                            {filteredEmployees.map(employee => (
+                                <CheckBox checked={employeeChecked(employee.id)}
+                                          onChange={() => handleSelectEmployee(employee)}
+                                          key={`employee_${employee.id}`}
+                                          image={employee.avatar}
+                                          label={employee.name}/>
+                            ))}
                         </div>
                         <div className='flex justify-end'>
-                            <button
-                                className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
+                            <button onClick={HandleUpdateMainFilter}
+                                    className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
                             </button>
                         </div>
                     </Dropdown>
