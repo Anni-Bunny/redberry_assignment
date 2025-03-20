@@ -16,7 +16,7 @@ import {FilterItem} from "../components/FilterItem.tsx";
 interface AllTasksFilter {
     departments: Department[],
     priorities: Priority[],
-    employees: Employee[]
+    employee: Employee | null
 }
 
 
@@ -32,7 +32,7 @@ export const AllTasks = () => {
     const clearFiters = {
         departments: [],
         priorities: [],
-        employees: []
+        employee: null
     }
 
 
@@ -43,7 +43,7 @@ export const AllTasks = () => {
 
     const [selectedDepartments, setSelectedDepartments] = useState<Department[]>(filters.departments);
     const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>(filters.priorities);
-    const [selectedEmployees, setSelectedEmployees] = useState<Employee[]>(filters.employees);
+    const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(filters.employee);
 
     //requests
     useEffect(() => {
@@ -75,17 +75,19 @@ export const AllTasks = () => {
     }, [filters]);
 
     function HandleUpdateMainFilter() {
-        // Filter employees by departments
-        const updatedEmployees = selectedEmployees.filter(employee => depChecked(employee.department.id));
+        let updatedEmployees = selectedEmployee
 
-        // Set the filtered employees and then update the filters
-        setSelectedEmployees(updatedEmployees);
+        // Filter employees by departments
+       if (selectedEmployee && selectedDepartments.length && !depChecked(selectedEmployee.department.id)) {
+           updatedEmployees = null
+           setSelectedEmployee(null);
+       }
 
         // Use the updated employees in setFilters
         setFilters({
             departments: selectedDepartments,
             priorities: selectedPriorities,
-            employees: updatedEmployees, // Use the filtered version here
+            employee: updatedEmployees, // Use the filtered version here
         });
     }
 
@@ -95,7 +97,7 @@ export const AllTasks = () => {
                 setSelectedDepartments(() => filters.departments)
                 break
             case "employee":
-                setSelectedEmployees(() => filters.employees)
+                setSelectedEmployee(() => filters.employee)
                 break
             case "priority":
                 setSelectedPriorities(() => filters.priorities)
@@ -107,7 +109,7 @@ export const AllTasks = () => {
         setFilters(clearFiters)
         setSelectedDepartments([])
         setSelectedPriorities([])
-        setSelectedEmployees([])
+        setSelectedEmployee(null)
     }
 
     // tasks
@@ -115,7 +117,7 @@ export const AllTasks = () => {
         return tasks.filter(task => {
             const isDepartmentMatch = filters.departments.length === 0 || filters.departments.find(item => item.id === task.department.id);
             const isPriorityMatch = filters.priorities.length === 0 || filters.priorities.find(item => item.id === task.priority.id);
-            const isEmployeeMatch = filters.employees.length === 0 || filters.employees.find(item => item.id === task.employee.id);
+            const isEmployeeMatch = filters.employee === null || filters.employee?.id === task.employee.id;
 
             return isDepartmentMatch && isPriorityMatch && isEmployeeMatch;
         })
@@ -172,21 +174,9 @@ export const AllTasks = () => {
         return filterEmployees(employees)
     }, [filters.departments, employees]);
 
-    function handleToggleEmployee(employee: Employee) {
-        if (employeeChecked(employee.id)) {
-            setSelectedEmployees((oldSelectedEmployees) => {
-                return oldSelectedEmployees.filter(emp => emp.id !== employee.id);
-            });
-        } else {
-            setSelectedEmployees((oldSelectedEmployees) => {
-                return [...oldSelectedEmployees, employee];
-            });
-        }
-    }
-
     const employeeChecked = useCallback((id: number) => {
-        return !!selectedEmployees?.find(emp => emp.id === id);
-    }, [selectedEmployees]);
+        return selectedEmployee?.id === id;
+    }, [selectedEmployee]);
 
     return (
         <Container>
@@ -240,7 +230,7 @@ export const AllTasks = () => {
                         <div className='flex flex-col gap-[22px]'>
                             {filteredEmployees.map(employee => (
                                 <CheckBox checked={employeeChecked(employee.id)}
-                                          onChange={() => handleToggleEmployee(employee)}
+                                          onChange={() => setSelectedEmployee(employee)}
                                           key={`employee_${employee.id}`}
                                           image={employee.avatar}
                                           label={employee.name}/>
@@ -276,20 +266,19 @@ export const AllTasks = () => {
                             }}
                         />
                     ))}
-
-                    {filters.employees.map(item => (
+                    { filters.employee &&
                         <FilterItem
-                            key={`filter_employees_${item.id}`}
-                            label={item.name}
+                            key={`filter_employees_${filters.employee.id}`}
+                            label={filters.employee.name}
                             onRemove={() => {
-                                handleToggleEmployee(item);
+                                setSelectedEmployee(null);
                                 HandleUpdateMainFilter();
                             }}
                         />
-                    ))}
+                    }
 
                     {
-                       !!(filters.departments.length || filters.employees.length || filters.priorities.length) &&
+                       !!(filters.departments.length || filters.employee || filters.priorities.length) &&
                         <span className="text-sm items-center flex px-[10px] py-[6px] text-[#343A40] cursor-pointer" onClick={clearAllFilters}>გასუფთავება</span>
                     }
                 </div>
