@@ -10,6 +10,7 @@ import {StatusColumn} from "../components/StatusColumn.tsx";
 import {Department} from "../interfaces/department.ts";
 import {Priority} from "../interfaces/Priority.ts";
 import {Employee} from "../interfaces/employee.ts";
+import {FilterItem} from "../components/FilterItem.tsx";
 
 
 interface AllTasksFilter {
@@ -28,15 +29,17 @@ export const AllTasks = () => {
 
     const [employees, setEmployees] = useState<Employee[]>([])
 
-    const storedFilters = JSON.parse(localStorage.getItem('filters') as string) || {
+    const clearFiters = {
         departments: [],
         priorities: [],
         employees: []
-    };
+    }
+
+
+    const storedFilters = JSON.parse(localStorage.getItem('filters') as string) || clearFiters;
 
     const [filters, setFilters] = useState<AllTasksFilter>(storedFilters)
 
-    const filterKeys = Object.keys(filters) as (keyof AllTasksFilter)[];
 
     const [selectedDepartments, setSelectedDepartments] = useState<Department[]>(filters.departments);
     const [selectedPriorities, setSelectedPriorities] = useState<Priority[]>(filters.priorities);
@@ -100,6 +103,13 @@ export const AllTasks = () => {
         }
     }
 
+    function clearAllFilters() {
+        setFilters(clearFiters)
+        setSelectedDepartments([])
+        setSelectedPriorities([])
+        setSelectedEmployees([])
+    }
+
     // tasks
     function filterTasks(tasks: Task[]) {
         return tasks.filter(task => {
@@ -113,11 +123,11 @@ export const AllTasks = () => {
 
     const filteredTasks = useMemo(() => {
         return filterTasks(tasks)
-    }, [tasks]);
+    }, [filters,tasks]);
 
     // department
 
-    function handleSelectDepatrment(department: Department) {
+    function handleToggleDepatrment(department: Department) {
         if (depChecked(department.id)) {
             setSelectedDepartments((oldSelectedDeps) => {
                 return oldSelectedDeps.filter(dep => dep.id !== department.id)
@@ -135,7 +145,7 @@ export const AllTasks = () => {
 
     // priority
 
-    function handleSelectPriority(priority: Priority) {
+    function handleTogglePriority(priority: Priority) {
         if (priorityChecked(priority.id)) {
             setSelectedPriorities((oldSelectedPriorities) => {
                 return oldSelectedPriorities.filter(prio => prio.id !== priority.id);
@@ -162,7 +172,7 @@ export const AllTasks = () => {
         return filterEmployees(employees)
     }, [filters.departments, employees]);
 
-    function handleSelectEmployee(employee: Employee) {
+    function handleToggleEmployee(employee: Employee) {
         if (employeeChecked(employee.id)) {
             setSelectedEmployees((oldSelectedEmployees) => {
                 return oldSelectedEmployees.filter(emp => emp.id !== employee.id);
@@ -193,7 +203,7 @@ export const AllTasks = () => {
                         <div className='flex flex-col gap-[22px]'>
                             {departments.map(department => (
                                 <CheckBox checked={depChecked(department.id)}
-                                          onChange={() => handleSelectDepatrment(department)}
+                                          onChange={() => handleToggleDepatrment(department)}
                                           key={`department_${department.id}`}
                                           label={department.name}/>
                             ))}
@@ -211,7 +221,7 @@ export const AllTasks = () => {
                         <div className='flex flex-col gap-[22px]'>
                             {priorities.map(priority => (
                                 <CheckBox checked={priorityChecked(priority.id)}
-                                          onChange={() => handleSelectPriority(priority)}
+                                          onChange={() => handleTogglePriority(priority)}
                                           key={`priority_${priority.id}`}
                                           label={priority.name}/>
                             ))}
@@ -230,7 +240,7 @@ export const AllTasks = () => {
                         <div className='flex flex-col gap-[22px]'>
                             {filteredEmployees.map(employee => (
                                 <CheckBox checked={employeeChecked(employee.id)}
-                                          onChange={() => handleSelectEmployee(employee)}
+                                          onChange={() => handleToggleEmployee(employee)}
                                           key={`employee_${employee.id}`}
                                           image={employee.avatar}
                                           label={employee.name}/>
@@ -244,24 +254,48 @@ export const AllTasks = () => {
                     </Dropdown>
                 </div>
 
-                <div className={"flex gap-2"}>
-                    {
-                        filterKeys.map(filter =>
-                            filters[filter].map(item => {
-                                const name = item.name || ''; // Safely get the name
+                <div className={"flex gap-2 mt-[24px]"}>
+                    {filters.departments.map(item => (
+                        <FilterItem
+                            key={`filter_departments_${item.id}`}
+                            label={item.name}
+                            onRemove={() => {
+                                handleToggleDepatrment(item);
+                                HandleUpdateMainFilter();
+                            }}
+                        />
+                    ))}
 
-                                return (
-                                    <button key={`${filter}_${item.id}`} className="bg-red" name={filter}
-                                            value={item.id}>
-                                        {name}
-                                    </button>
-                                );
-                            })
-                        )
+                    {filters.priorities.map(item => (
+                        <FilterItem
+                            key={`filter_priorities_${item.id}`}
+                            label={item.name}
+                            onRemove={() => {
+                                handleTogglePriority(item);
+                                HandleUpdateMainFilter();
+                            }}
+                        />
+                    ))}
+
+                    {filters.employees.map(item => (
+                        <FilterItem
+                            key={`filter_employees_${item.id}`}
+                            label={item.name}
+                            onRemove={() => {
+                                handleToggleEmployee(item);
+                                HandleUpdateMainFilter();
+                            }}
+                        />
+                    ))}
+
+                    {
+                       !!(filters.departments.length || filters.employees.length || filters.priorities.length) &&
+                        <span className="text-sm items-center flex px-[10px] py-[6px] text-[#343A40] cursor-pointer" onClick={clearAllFilters}>გასუფთავება</span>
                     }
                 </div>
 
-                <div className='flex w-full justify-between items-start mt-[79px] gap-[52px]'>
+
+                <div className='flex w-full justify-between items-start mt-[24px] gap-[52px]'>
                     {
                         statuses.map(status => <StatusColumn key={'status_' + status.id} status={status}
                                                              tasks={filteredTasks}/>)
