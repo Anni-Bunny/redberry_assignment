@@ -1,6 +1,8 @@
-import {Dialog, Transition} from '@headlessui/react'
+import {Input, Dialog, Field, Label, Transition, Select} from '@headlessui/react'
 import {Fragment} from 'react'
 import {Cancel} from "../assets/icons/Cancel.tsx";
+import {Asterisk} from "../assets/icons/Asterisk.tsx";
+import {Check} from "../assets/icons/Check.tsx";
 
 
 interface ModalProps {
@@ -41,20 +43,67 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                             </div>
 
                             <div className='flex flex-col items-center gap-[45px]'>
-                                <Dialog.Title
-                                    as="h3"
-                                    className="text-[32px] font-medium text-[#212529]"
-                                >
+                                <Dialog.Title as="h3" className="text-[32px] font-medium text-[#212529]">
                                     თანამშრომლის დამატება
                                 </Dialog.Title>
 
-                                <div className='h-[439px]'>
-                                    <div className='flex gap-[45px]'>
+                                <div className='h-[439px] flex flex-col w-full gap-[45px]'>
+
+                                    <div className='flex justify-between gap-[45px]'>
+                                        <Field className="flex-1/2">
+                                            <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                                                სახელი <Asterisk className="mt-[3px]"/>
+                                            </Label>
+                                            <Input required={true}
+                                                   className="text-sm w-full rounded-[5px] border border-[#DEE2E6] p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none"/>
+                                            <div className="mt-[6px] flex flex-col text-start">
+                                                <span className="flex gap-1 items-center text-sm/6 text-[#6C757D]">
+                                                    <Check/>
+                                                    <span>მინიმუმ 2 სიმბოლო.</span>
+                                                </span>
+                                                <span className="flex gap-1 items-center text-sm/6 text-[#6C757D]">
+                                                    <Check/>
+                                                    <span>მინიმუმ 255 სიმბოლო</span>
+                                                </span>
+                                            </div>
+                                        </Field>
+
+                                        <Field className="flex-1/2">
+                                            <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                                                გვარი <Asterisk className="mt-[3px]"/>
+                                            </Label>
+                                            <Input required={true}
+                                                   className="text-sm w-full rounded-[5px] border border-[#DEE2E6] p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none"/>
+                                            <div className="mt-[6px] flex flex-col text-start">
+                                                <span className="flex gap-1 items-center text-sm/6 text-[#6C757D]">
+                                                    <Check/>
+                                                    <span>მინიმუმ 2 სიმბოლო.</span>
+                                                </span>
+                                                <span className="flex gap-1 items-center text-sm/6 text-[#6C757D]">
+                                                    <Check/>
+                                                    <span>მინიმუმ 255 სიმბოლო</span>
+                                                </span>
+                                            </div>
+                                        </Field>
+
                                     </div>
 
-                                    <div></div>
+                                    <div>
+                                        
+                                    </div>
 
-                                    <div></div>
+                                    <Field className="flex flex-col">
+                                        <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                                            დეპარტამენტი <Asterisk className="mt-[3px]"/>
+                                        </Label>
+                                        <Select
+                                            value={'22'}
+                                            className=" text-sm w-[384px] rounded-[5px] border border-[#DEE2E6] p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none">
+                                            <option className="text-sm" value="active">Active</option>
+                                            <option className="text-sm" value="22">22</option>
+                                        </Select>
+                                    </Field>
+
                                 </div>
                             </div>
 
