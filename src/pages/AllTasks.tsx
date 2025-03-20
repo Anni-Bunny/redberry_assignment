@@ -11,6 +11,7 @@ import {Department} from "../interfaces/department.ts";
 import {Priority} from "../interfaces/Priority.ts";
 import {Employee} from "../interfaces/employee.ts";
 import {FilterItem} from "../components/FilterItem.tsx";
+import {useLocation} from "react-router-dom";
 
 
 interface AllTasksFilter {
@@ -20,7 +21,7 @@ interface AllTasksFilter {
 }
 
 
-export const AllTasks = () => {
+export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) => {
     const [tasks, setTasks] = useState<Task[]>([])
 
     const [statuses, setStatuses] = useState<Status[]>([])
@@ -35,6 +36,11 @@ export const AllTasks = () => {
         employee: null
     }
 
+    const location = useLocation()
+
+    if (lastVisitedUrl && lastVisitedUrl !== location.pathname) {
+        localStorage.removeItem('filters')
+    }
 
     const storedFilters = JSON.parse(localStorage.getItem('filters') as string) || clearFiters;
 
@@ -108,7 +114,7 @@ export const AllTasks = () => {
 
     const filteredTasks = useMemo(() => {
         return filterTasks(tasks)
-    }, [filters,tasks]);
+    }, [filters, tasks]);
 
     // department
 
@@ -185,7 +191,7 @@ export const AllTasks = () => {
         return selectedEmployee?.id === id;
     }, [selectedEmployee]);
 
-    function HandleFilterByEmployee(employee?:Employee|null) {
+    function HandleFilterByEmployee(employee?: Employee | null) {
         setFilters({
             ...filters,
             employee: employee === null ? employee : selectedEmployee
@@ -278,7 +284,7 @@ export const AllTasks = () => {
                             }}
                         />
                     ))}
-                    { filters.employee &&
+                    {filters.employee &&
                         <FilterItem
                             key={`filter_employees_${filters.employee.id}`}
                             label={filters.employee.name}
@@ -291,7 +297,8 @@ export const AllTasks = () => {
 
                     {
                         !!(filters.departments.length || filters.employee || filters.priorities.length) &&
-                        <span className="text-sm items-center flex px-[10px] py-[6px] text-[#343A40] cursor-pointer" onClick={clearAllFilters}>გასუფთავება</span>
+                        <span className="text-sm items-center flex px-[10px] py-[6px] text-[#343A40] cursor-pointer"
+                              onClick={clearAllFilters}>გასუფთავება</span>
                     }
                 </div>
 
