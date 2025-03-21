@@ -57,10 +57,10 @@ export function EmployeeSelect({
                                 value={employee.id}
                                 as={Fragment}
                             >
-                                {({active, selected}) => (
+                                {({selected}) => (
                                     <li
-                                        className={`cursor-pointer select-none px-4 py-2 flex items-center gap-2 ${
-                                            active ? 'bg-gray-100' : ''
+                                        className={`cursor-pointer select-none px-4 py-2 flex items-center gap-2 hover:bg-gray-100 ${
+                                            selected ? 'bg-gray-200' : ''
                                         }`}
                                     >
                                         <img
@@ -69,7 +69,6 @@ export function EmployeeSelect({
                                             className="w-6 h-6 rounded-full object-cover"
                                         />
                                         <span>{employee.name} {employee.surname}</span>
-                                        {selected && <span className="ml-auto text-green-500">✔</span>}
                                     </li>
                                 )}
                             </Listbox.Option>
