@@ -201,7 +201,7 @@ export const CreateNewTask = () => {
                                       value={formik.values.description}
                                       onChange={formik.handleChange}
                                       onBlur={formik.handleBlur}
-                                      className={(formik.touched.description && formik.errors.description ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + " text-sm w-full rounded-[5px] border p-[14px] h-[133px] bg-[#FFFFFF] focus:outline-none"}/>
+                                      className={(formik.touched.description && formik.errors.description ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + " resize-none text-sm w-full rounded-[5px] border p-[14px] h-[133px] bg-[#FFFFFF] focus:outline-none"}/>
                             <div className="mt-[6px] flex flex-col text-start">
                                 <ValidationHint
                                     isValid={formik.values.description.trim().split(/\s+/).length >= 4}
