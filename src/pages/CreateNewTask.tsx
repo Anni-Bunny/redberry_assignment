@@ -22,6 +22,8 @@ import { useNavigate } from 'react-router-dom';
 
 export const CreateNewTask = () => {
 
+    const [hasLoaded, setHasLoaded] = useState(false);
+
     const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>()
 
@@ -51,8 +53,8 @@ export const CreateNewTask = () => {
             dispatch(loadEmployees(res.data))
         })
 
+        loadFromLocalStorage()
     }, []);
-
 
     const formik = useFormik({
         initialValues: {
@@ -91,13 +93,32 @@ export const CreateNewTask = () => {
             try {
                 await api.createTask(formData);
                 console.log('Employee created');
+                formik.resetForm();
                 navigate('/');
             } catch (error) {
                 console.error("Error creating employee", error);
             }
-        }
-
+        },
     })
+
+    function loadFromLocalStorage() {
+        const saved = localStorage.getItem("taskCreateFormData");
+        if (saved) {
+            try {
+                const parsed = JSON.parse(saved);
+                formik.setValues(parsed);
+            } catch (e) {
+                console.warn("Failed to parse saved form data");
+            }
+        }
+        setHasLoaded(true);
+    }
+
+    useEffect(() => {
+        if (hasLoaded) {
+            localStorage.setItem("taskCreateFormData", JSON.stringify(formik.values));
+        }
+    }, [formik.values, hasLoaded]);
 
     const filteredEmployees = useMemo(() => {
         return filterEmployees(employees)
