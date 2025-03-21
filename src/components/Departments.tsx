@@ -15,8 +15,10 @@ export function Departments({department, classname}: { department: Department, c
     const selectedColor = depColors[department.id % depColors.length]
 
     return (
-        <div className={`${classname} text-nowrap overflow-hidden text-ellipsis w-[88px] h-6 rounded-[15px] py-[5px] px-[9px] text-white font-normal text-xs items-center justify-center ${selectedColor}`}>
-            {department.name}
+        <div className={`${classname} flex justify-start w-[88px] h-6 rounded-[15px] py-[5px] px-[9px] text-white font-normal text-xs items-center ${selectedColor}`}>
+            <span className={"text-nowrap overflow-hidden text-ellipsis"}>
+                {department.name}
+            </span>
         </div>
     );
 };
