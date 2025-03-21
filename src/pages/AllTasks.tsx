@@ -254,7 +254,7 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
                         <div className='flex flex-col gap-[22px]'>
                             {filteredEmployees.map(employee => (
                                 <CheckBox checked={employeeChecked(employee.id)}
-                                          onChange={() => setSelectedEmployee(employee)}
+                                          onChange={() => setSelectedEmployee(employeeChecked(employee.id) ? null : employee)}
                                           key={`employee_${employee.id}`}
                                           image={employee.avatar}
                                           label={employee.name + ' ' + employee.surname}/>
