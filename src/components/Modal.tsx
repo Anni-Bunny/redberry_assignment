@@ -19,7 +19,6 @@ interface ModalProps {
 
 export default function Modal({isOpen, closeModal}: ModalProps) {
 
-    const [imageFile, setImageFile] = useState<File | null>(null)
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [departments, setDeepartments] = useState<Department[]>([])
 
@@ -43,10 +42,24 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
             department: Yup.string().required('დეპარტამენტი სავალდებულოა.'),
             avatar: Yup.mixed().required('ავატარის ატვირთვა სავალდებულოა.'),
         }),
-        onSubmit: (values) => {
-            console.log('🦄 Submitted:', values)
-            handleClose()
+        onSubmit: async (values) => {
+            const formData = new FormData();
+            formData.append("name", values.firstName);
+            formData.append("surname", values.lastName);
+            formData.append("department_id", values.department);
+            if (values.avatar) {
+                formData.append("avatar", values.avatar);
+            }
+
+            try {
+                await api.createEmployee(formData);
+                console.log('Employee created');
+                handleClose();
+            } catch (error) {
+                console.error("Error creating employee", error);
+            }
         }
+
     })
 
 
@@ -57,18 +70,30 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
         },
         maxFiles: 1,
         onDrop: (acceptedFiles) => {
-            const file = acceptedFiles[0]
+            const file = acceptedFiles[0];
             if (file) {
-                setImageFile(file)
-                setImagePreview(URL.createObjectURL(file))
-                formik.setFieldValue('avatar', file)
+                const img = new Image();
+                img.src = URL.createObjectURL(file);
+                img.onload = () => {
+                    if (file.size > 600 * 1024) {
+                        formik.setFieldError('avatar', 'ფაილის ზომა არ უნდა აღემატებოდეს 600KB-ს.');
+                        return;
+                    }
+
+                    if (img.width > 500 || img.height > 500) {
+                        formik.setFieldError('avatar', 'სურათის ზომა არ უნდა აღემატებოდეს 500x500px-ს.');
+                        return;
+                    }
+
+                    setImagePreview(URL.createObjectURL(file));
+                    formik.setFieldValue('avatar', file);
+                };
             }
         }
     })
 
     const handleImageRemove = () => {
         setImagePreview(null)
-        setImageFile(null)
         formik.setFieldValue('avatar', null)
     }
 
@@ -76,7 +101,6 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
     const handleClose = () => {
         formik.resetForm();
         setImagePreview(null);
-        setImageFile(null);
         closeModal();
     };
 
@@ -86,11 +110,6 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
             setDeepartments(res.data)
         })
     }, [])
-
-
-    function createEmployee() {
-
-    }
 
 
     return (
@@ -129,7 +148,7 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                     თანამშრომლის დამატება
                                 </Dialog.Title>
 
-                                <form onSubmit={formik.handleSubmit} className='h-[439px] flex flex-col w-full gap-[45px]'>
+                                <form id={"employee-form"} onSubmit={formik.handleSubmit} className='h-[439px] flex flex-col w-full gap-[45px]'>
 
                                     <div className='flex justify-between gap-[45px]'>
                                         <Field className="flex-1/2">
@@ -207,7 +226,7 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                             ავატარი <Asterisk className="mt-[3px]"/>
                                         </label>
                                         <div
-                                            className={(formik.touched.avatar && formik.errors.avatar ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + "dropzone h-[120px] flex flex-col items-center justify-center border border-dashed "} {...getRootProps()}>
+                                            className={(formik.touched.avatar && formik.errors.avatar ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + " dropzone h-[120px] flex flex-col items-center justify-center border border-dashed "} {...getRootProps()}>
                                             <input {...getInputProps()} />
                                             {imagePreview ? (
                                                 <div className="relative">
@@ -224,8 +243,8 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                 </div>
                                             ) : (
                                                 <>
-                                                    <p>Drag 'n' drop some files here, or click to select files</p>
-                                                    <em>(Only *.jpeg and *.png images will be accepted)</em>
+                                                    <p>ჩააგდე ფოტო აქ</p>
+                                                    <em>(მხოლოდ *.jpeg და *.png)</em>
                                                     {formik.touched.avatar && formik.errors.avatar && (
                                                         <div className="text-red-500 text-sm mt-1">{formik.errors.avatar}</div>
                                                     )}
@@ -245,8 +264,9 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                 value={formik.values.department}
                                                 onChange={formik.handleChange}
                                                 onBlur={formik.handleBlur}
-                                                className={ (formik.touched.avatar && formik.errors.avatar ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' cursor-pointer text-sm w-[384px] rounded-[5px] border  p-[14px] h-[45px] appearance-none '}
+                                                className={ (formik.touched.department && formik.errors.department ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' cursor-pointer text-sm w-[384px] rounded-[5px] border  p-[14px] h-[45px] appearance-none '}
                                             >
+                                                <option></option>
                                                 {
                                                     departments.map((department) => (
                                                         <option key={department.id} value={department.id}>{department.name}</option>
@@ -258,9 +278,6 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                 aria-hidden="true"
                                             />
                                         </div>
-                                        {formik.touched.department && formik.errors.department && (
-                                            <div className="text-red-500 text-sm mt-1">{formik.errors.department}</div>
-                                        )}
                                     </Field>
 
                                 </form>
@@ -276,7 +293,8 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                 </button>
 
                                 <button
-                                    type="button"
+                                    type="submit"
+                                    form="employee-form"
                                     className="inline-flex justify-center rounded-md border border-transparent bg-[#8338EC]  px-4 py-2 text-sm font-medium text-white cursor-pointer"
                                 >
                                     დაამატე თანამშრომელი

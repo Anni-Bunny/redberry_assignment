@@ -36,9 +36,14 @@ class API {
         return this.axios.get('/employees');
     }
 
-    createEmployee() {
-        return this.axios.post('/employees',{});
+    createEmployee(data: FormData) {
+        return this.axios.post('/employees', data, {
+            headers: {
+                'Content-Type': 'multipart/form-data'
+            }
+        });
     }
+
 
     public getTasks(id?: number) {
         return this.axios.get('/tasks' + (id ? `/${id}` : ''));
