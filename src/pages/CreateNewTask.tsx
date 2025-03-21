@@ -74,9 +74,10 @@ export const CreateNewTask = () => {
                 .max(255, 'მაქსიმუმ 255 სიმბოლო.'),
             priority: Yup.string().required('პრიორიტეტი სავალდებულოა.'),
             status: Yup.string().required('სტატუსი სავალდებულოა.'),
-            employee: Yup.string().required('თანამშრომელი სავალდებულოა.'),
-            due_date: Yup.string().required('დედლაინი სავალდებულოა.'),
             department: Yup.string().required('დეპარტამენტი სავალდებულოა.'),
+            employee: Yup.string().required('თანამშრომელი სავალდებულოა.'),
+            due_date: Yup.date().required('დედლაინი სავალდებულოა.')
+                .min(new Date(new Date().setHours(0, 0, 0, 0)), 'დედლაინი არ შეიძლება წარსული იყოს.'),
         }),
         onSubmit: async (values) => {
             const formData = new FormData();
