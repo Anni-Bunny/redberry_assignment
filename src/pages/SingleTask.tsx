@@ -11,7 +11,7 @@ import {Calendar} from "../assets/icons/Calendar.tsx";
 import {LeftArrow} from "../assets/icons/LeftArrow.tsx";
 import {format} from "date-fns";
 import {Comment} from "../interfaces/Comment.ts";
-import {Select} from "@headlessui/react";
+import {Select, Textarea} from "@headlessui/react";
 import {DownArrow} from "../assets/icons/DownArrow.tsx";
 import {Status} from "../interfaces/Status.ts";
 
@@ -110,7 +110,8 @@ export function SingleTask() {
                                         <span>თანამშრომელი</span>
                                     </div>
                                     <div className='flex gap-3 items-center'>
-                                        <img src={task.employee.avatar} alt={'img'} className='w-8 h-8 rounded-full object-cover'/>
+                                        <img src={task.employee.avatar} alt={'img'}
+                                             className='w-8 h-8 rounded-full object-cover'/>
 
                                         <div className='flex flex-col'>
                                             <p className='text-[11px] font-light justify-end text-[#474747]'>{task.department.name}</p>
@@ -136,32 +137,64 @@ export function SingleTask() {
 
                     <div
                         className='w-[741px] h-[975px] border-[0.3px] border-[#DDD2FF] rounded-[10px] mt-[99px] bg-[#F8F3FEA6] py-10 px-[45px] flex flex-col gap-[66px]'>
-                        <div
+
+                        <label
                             className='px-5 pt-[18px] pb-[15px] bg-[#FFFFFF] h-[135px] border-[0.3px] border-[#ADB5BD] rounded-[10px] flex flex-col gap-[30px]'>
-                            <textarea placeholder='დაწერე კომენტარი' className='outline-0'/>
+                            <Textarea placeholder='დაწერე კომენტარი' className='resize-none outline-0'/>
 
                             <div className='flex justify-end'>
                                 <button
-                                    className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>დააკომენტარე
+                                    className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>
+                                    დააკომენტარე
                                 </button>
                             </div>
-                        </div>
+                        </label>
 
                         <div className='flex flex-col gap-10'>
-                            <h3 className='font-medium text-xl flex gap-[7px]'>კომენტარები <span
-                                className='bg-[#8338EC] w-[30px] rounded-[30px] p-2.5 text-white'>{comments.length}</span>
-                            </h3>
-
-                            <div className='flex gap-3'>
-                                <img src={task.employee.avatar} alt={'img'} className='w-[38px]'/>
-                                <div>
-                                    <h3 className='text-[#212529] font-medium text-lg mb-2'>{task.employee.name}</h3>
-                                    <p className='text-[#343A40] text-[16px] font-[350] mb-2.5'>comment</p>
-                                    <button className='flex text-[#8338EC] text-xs font-normal gap-[6px]'>
-                                        <LeftArrow/> უპასუხე
-                                    </button>
-                                </div>
+                            <div className="flex gap-[7px] items-center">
+                                <h3 className='font-medium text-xl flex gap-[7px]'>
+                                    კომენტარები
+                                </h3>
+                                <span
+                                    className='font-medium text-sm bg-[#8338EC] rounded-[30px] px-[11px] py-[2.5px] text-white'>
+                                    {comments.length}
+                                </span>
                             </div>
+
+                            <div className="flex flex-col gap-[38px] ">
+
+                                {comments.map((comment) => (
+                                    <div key={"comment_" + comment.id} className='flex gap-3'>
+                                        <img src={comment.author_avatar} alt={'img'}
+                                             className='h-[38px] w-[38px] rounded-full object-cover'/>
+                                        <div className="flex-1">
+                                            <h3 className='text-[#212529] font-medium text-lg mb-2'>{comment.author_nickname}</h3>
+                                            <p className='text-[#343A40] text-[16px] font-[350] mb-2.5'>{comment.text}</p>
+                                            <button className=' cursor-pointer flex text-[#8338EC] text-xs font-normal gap-[6px]'>
+                                                <LeftArrow/> უპასუხე
+                                            </button>
+
+                                            {/*subComments*/}
+                                            <div className='flex flex-col w-full gap-5 mt-5'>
+                                                {
+                                                    comment.sub_comments?.map((subComment) => (
+                                                        <div key={"comment_" + subComment.id} className='flex gap-3'>
+                                                            <img src={subComment.author_avatar} alt={'img'}
+                                                                 className='h-[38px] w-[38px] rounded-full object-cover'/>
+                                                            <div className="flex-1">
+                                                                <h3 className='text-[#212529] font-medium text-lg mb-2'>{subComment.author_nickname}</h3>
+                                                                <p className='text-[#343A40] text-[16px] font-[350] mb-2.5'>{subComment.text}</p>
+                                                            </div>
+                                                        </div>
+                                                    ))
+                                                }
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))}
+
+                            </div>
+
 
                         </div>
 
