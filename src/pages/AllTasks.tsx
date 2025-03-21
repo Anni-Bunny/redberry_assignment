@@ -12,6 +12,9 @@ import {Priority} from "../interfaces/Priority.ts";
 import {Employee} from "../interfaces/employee.ts";
 import {FilterItem} from "../components/FilterItem.tsx";
 import {useLocation} from "react-router-dom";
+import {useDispatch, useSelector} from "react-redux";
+import {RootState, AppDispatch} from "../store/store.ts";
+import {loadEmployees} from "../store/slices/employeesSlice.ts";
 
 
 interface AllTasksFilter {
@@ -28,7 +31,8 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
     const [departments, setDepartments] = useState<Department[]>([])
     const [priorities, setPriorities] = useState<Priority[]>([])
 
-    const [employees, setEmployees] = useState<Employee[]>([])
+    const dispatch = useDispatch<AppDispatch>()
+    const employees = useSelector((state: RootState) => state.employees.data)
 
     const clearFiters = {
         departments: [],
@@ -66,7 +70,7 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
         })
 
         api.getEmployees().then(function (res) {
-            setEmployees(res.data)
+            dispatch(loadEmployees(res.data))
         })
 
         api.getTasks().then(function (res) {
@@ -253,7 +257,7 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
                                           onChange={() => setSelectedEmployee(employee)}
                                           key={`employee_${employee.id}`}
                                           image={employee.avatar}
-                                          label={employee.name}/>
+                                          label={employee.name + ' ' + employee.surname}/>
                             ))}
                         </div>
                         <div className='flex justify-end'>

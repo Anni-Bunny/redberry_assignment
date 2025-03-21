@@ -10,6 +10,9 @@ import {useFormik} from "formik";
 import * as Yup from 'yup';
 import {Department} from "../interfaces/department.ts";
 import {api} from "../classes/API.ts";
+import { useDispatch } from 'react-redux'
+import type { AppDispatch } from '../store/store'
+import { addEmployee } from '../store/slices/employeesSlice'
 
 
 interface ModalProps {
@@ -18,6 +21,8 @@ interface ModalProps {
 }
 
 export default function Modal({isOpen, closeModal}: ModalProps) {
+
+    const dispatch = useDispatch<AppDispatch>()
 
     const [imagePreview, setImagePreview] = useState<string | null>(null)
     const [departments, setDeepartments] = useState<Department[]>([])
@@ -52,7 +57,8 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
             }
 
             try {
-                await api.createEmployee(formData);
+                const res = await api.createEmployee(formData);
+                dispatch(addEmployee(res.data));
                 console.log('Employee created');
                 handleClose();
             } catch (error) {
