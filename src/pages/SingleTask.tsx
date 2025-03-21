@@ -8,12 +8,13 @@ import {Container} from "../components/Container.tsx";
 import {PieChart} from "../assets/icons/PieChart.tsx";
 import {User} from "../assets/icons/User.tsx";
 import {Calendar} from "../assets/icons/Calendar.tsx";
-import {LeftArrow} from "../assets/icons/LeftArrow.tsx";
 import {format} from "date-fns";
 import {Comment} from "../interfaces/Comment.ts";
-import {Select, Textarea} from "@headlessui/react";
+import {Select} from "@headlessui/react";
 import {DownArrow} from "../assets/icons/DownArrow.tsx";
 import {Status} from "../interfaces/Status.ts";
+import {CommentItem} from "../components/CommentItem.tsx";
+import {CommentForm} from "../components/CommentForm.tsx";
 
 export function SingleTask() {
     const {id} = useParams()
@@ -25,7 +26,6 @@ export function SingleTask() {
     const [selectedStatus, setSelectedStatus] = useState<Status>()
 
     const [commentText, setCommentText] = useState('');
-
 
     useEffect(() => {
         api.getTaskComments(Number(id)).then((res) => {
@@ -79,6 +79,13 @@ export function SingleTask() {
         }
     }
 
+    async function handleReply() {
+        if (task) {
+            const res = await api.getTaskComments(task.id);
+            setComments(res.data);
+        }
+    }
+
     return (
         <>
             {task &&
@@ -112,7 +119,7 @@ export function SingleTask() {
                                         >
                                             {
                                                 statuses.map((status) => (
-                                                    <option key={'status' + status.id}
+                                                    <option key={'status_' + status.id}
                                                             value={status.id}>{status.name}</option>
                                                 ))
                                             }
@@ -159,21 +166,11 @@ export function SingleTask() {
                         bg-[#F8F3FEA6] py-10 px-[45px]
                         flex flex-col justify-between gap-[66px]'>
 
-                        <label className='px-5 pt-[18px] pb-[15px] bg-[#FFFFFF] h-[135px] border-[0.3px] border-[#ADB5BD] rounded-[10px] flex flex-col gap-[30px]'>
-                            <Textarea placeholder='დაწერე კომენტარი'
-                                      className='resize-none outline-0'
-                                      value={commentText}
-                                      onChange={(e) => setCommentText(e.target.value)}
-                            />
-
-                            <div className='flex justify-end'>
-                                <button
-                                    onClick={handleCommentSubmit}
-                                    className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>
-                                    დააკომენტარე
-                                </button>
-                            </div>
-                        </label>
+                        <CommentForm
+                            value={commentText}
+                            onChange={(e) => setCommentText(e.target.value)}
+                            onSubmit={handleCommentSubmit}
+                        />
 
                         <div className='flex flex-1 flex-col gap-10 overflow-hidden justify-between'>
                             <div className="flex gap-[7px] items-center">
@@ -190,34 +187,7 @@ export function SingleTask() {
                             <div className="flex flex-col gap-[38px] flex-1 justify-between overflow-y-auto ">
 
                                 {comments.map((comment) => (
-                                    <div key={"comment_" + comment.id} className='flex gap-3'>
-                                        <img src={comment.author_avatar} alt={'img'}
-                                             className='h-[38px] w-[38px] rounded-full object-cover'/>
-                                        <div className="flex-1">
-                                            <h3 className='text-[#212529] font-medium text-lg mb-2'>{comment.author_nickname}</h3>
-                                            <p className='text-[#343A40] text-[16px] font-[350] mb-2.5'>{comment.text}</p>
-                                            <button
-                                                className=' cursor-pointer flex text-[#8338EC] text-xs font-normal gap-[6px]'>
-                                                <LeftArrow/> უპასუხე
-                                            </button>
-
-                                            {/*subComments*/}
-                                            <div className='flex flex-col w-full gap-5 mt-5'>
-                                                {
-                                                    comment.sub_comments?.map((subComment) => (
-                                                        <div key={"comment_" + subComment.id} className='flex gap-3'>
-                                                            <img src={subComment.author_avatar} alt={'img'}
-                                                                 className='h-[38px] w-[38px] rounded-full object-cover'/>
-                                                            <div className="flex-1">
-                                                                <h3 className='text-[#212529] font-medium text-lg mb-2'>{subComment.author_nickname}</h3>
-                                                                <p className='text-[#343A40] text-[16px] font-[350] mb-2.5'>{subComment.text}</p>
-                                                            </div>
-                                                        </div>
-                                                    ))
-                                                }
-                                            </div>
-                                        </div>
-                                    </div>
+                                    <CommentItem key={"comment_" + comment.id} comment={comment} onReplayCallback={handleReply} />
                                 ))}
 
                             </div>
@@ -229,4 +199,4 @@ export function SingleTask() {
             }
         </>
     )
-};
+}
