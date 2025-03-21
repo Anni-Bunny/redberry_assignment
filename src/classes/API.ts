@@ -44,7 +44,7 @@ class API {
         });
     }
 
-    getTaskComments(id:number){
+    getTaskComments(id: number) {
         return this.axios.get(`/tasks/${id}/comments`);
     }
 
@@ -52,7 +52,7 @@ class API {
         return this.axios.get('/tasks' + (id ? `/${id}` : ''));
     }
 
-    createTask(data:FormData) {
+    createTask(data: FormData) {
         return this.axios.post('/tasks', data);
     }
 
@@ -62,6 +62,9 @@ class API {
         });
     }
 
+    createTaskComment(data: { task_id: number, text: string, parent_id?: number }) {
+        return this.axios.post(`/tasks/${data.task_id}/comments`, data);
+    }
 }
 
 export const api = new API(config.url, config.token)

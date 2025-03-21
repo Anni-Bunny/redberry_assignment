@@ -24,6 +24,9 @@ export function SingleTask() {
 
     const [selectedStatus, setSelectedStatus] = useState<Status>()
 
+    const [commentText, setCommentText] = useState('');
+
+
     useEffect(() => {
         api.getTaskComments(Number(id)).then((res) => {
             setComments(res.data)
@@ -56,6 +59,23 @@ export function SingleTask() {
                 console.error("Error creating employee", error);
                 setSelectedStatus(oldStatus)
             }
+        }
+    }
+
+    async function handleCommentSubmit() {
+        if (!commentText.trim() || !task) return;
+
+        try {
+            await api.createTaskComment({
+                task_id: task.id,
+                text: commentText
+            });
+
+            const res = await api.getTaskComments(task.id);
+            setComments(res.data);
+            setCommentText('');
+        } catch (error) {
+            console.error("Failed to post comment", error);
         }
     }
 
@@ -135,22 +155,27 @@ export function SingleTask() {
                         </div>
                     </div>
 
-                    <div
-                        className='w-[741px] h-[975px] border-[0.3px] border-[#DDD2FF] rounded-[10px] mt-[99px] bg-[#F8F3FEA6] py-10 px-[45px] flex flex-col gap-[66px]'>
+                    <div className='w-[741px] h-[975px] border-[0.3px] border-[#DDD2FF] rounded-[10px] mt-[99px]
+                        bg-[#F8F3FEA6] py-10 px-[45px]
+                        flex flex-col justify-between gap-[66px]'>
 
-                        <label
-                            className='px-5 pt-[18px] pb-[15px] bg-[#FFFFFF] h-[135px] border-[0.3px] border-[#ADB5BD] rounded-[10px] flex flex-col gap-[30px]'>
-                            <Textarea placeholder='დაწერე კომენტარი' className='resize-none outline-0'/>
+                        <label className='px-5 pt-[18px] pb-[15px] bg-[#FFFFFF] h-[135px] border-[0.3px] border-[#ADB5BD] rounded-[10px] flex flex-col gap-[30px]'>
+                            <Textarea placeholder='დაწერე კომენტარი'
+                                      className='resize-none outline-0'
+                                      value={commentText}
+                                      onChange={(e) => setCommentText(e.target.value)}
+                            />
 
                             <div className='flex justify-end'>
                                 <button
+                                    onClick={handleCommentSubmit}
                                     className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>
                                     დააკომენტარე
                                 </button>
                             </div>
                         </label>
 
-                        <div className='flex flex-col gap-10'>
+                        <div className='flex flex-1 flex-col gap-10 overflow-hidden justify-between'>
                             <div className="flex gap-[7px] items-center">
                                 <h3 className='font-medium text-xl flex gap-[7px]'>
                                     კომენტარები
@@ -161,7 +186,8 @@ export function SingleTask() {
                                 </span>
                             </div>
 
-                            <div className="flex flex-col gap-[38px] ">
+                            {/* comments */}
+                            <div className="flex flex-col gap-[38px] flex-1 justify-between overflow-y-auto ">
 
                                 {comments.map((comment) => (
                                     <div key={"comment_" + comment.id} className='flex gap-3'>
@@ -170,7 +196,8 @@ export function SingleTask() {
                                         <div className="flex-1">
                                             <h3 className='text-[#212529] font-medium text-lg mb-2'>{comment.author_nickname}</h3>
                                             <p className='text-[#343A40] text-[16px] font-[350] mb-2.5'>{comment.text}</p>
-                                            <button className=' cursor-pointer flex text-[#8338EC] text-xs font-normal gap-[6px]'>
+                                            <button
+                                                className=' cursor-pointer flex text-[#8338EC] text-xs font-normal gap-[6px]'>
                                                 <LeftArrow/> უპასუხე
                                             </button>
 
@@ -194,7 +221,6 @@ export function SingleTask() {
                                 ))}
 
                             </div>
-
 
                         </div>
 
