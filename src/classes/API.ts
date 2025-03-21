@@ -44,6 +44,9 @@ class API {
         });
     }
 
+    getTaskComments(id:number){
+        return this.axios.get(`/tasks/${id}/comments`);
+    }
 
     public getTasks(id?: number) {
         return this.axios.get('/tasks' + (id ? `/${id}` : ''));

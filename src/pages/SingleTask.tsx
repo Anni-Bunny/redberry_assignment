@@ -6,26 +6,58 @@ import {TaskPriority} from "../components/TaskPriority.tsx";
 import {Departments} from "../components/Departments.tsx";
 import {Container} from "../components/Container.tsx";
 import {PieChart} from "../assets/icons/PieChart.tsx";
-import {Dropdown} from "../components/DropDown.tsx";
 import {User} from "../assets/icons/User.tsx";
 import {Calendar} from "../assets/icons/Calendar.tsx";
-import {ChevronArrowDown} from "../assets/icons/ChevronArrowDown.tsx";
-import {CheckBox} from "../components/Checkbox.tsx";
 import {LeftArrow} from "../assets/icons/LeftArrow.tsx";
 import {format} from "date-fns";
+import {Comment} from "../interfaces/Comment.ts";
+import {Select} from "@headlessui/react";
+import {DownArrow} from "../assets/icons/DownArrow.tsx";
+import {Status} from "../interfaces/Status.ts";
 
 export function SingleTask() {
     const {id} = useParams()
+
     const [task, setTask] = useState<Task>()
+    const [comments, setComments] = useState<Comment[]>([])
+    const [statuses, setStatuses] = useState<Status[]>([])
+
+    const [selectedStatus, setSelectedStatus] = useState<Status>()
 
     useEffect(() => {
-        const taskId = Number(id);
-        if (!isNaN(taskId)) {
-            api.getTasks(taskId).then(function (res) {
-                setTask(res.data)
-            })
-        }
+        api.getTaskComments(Number(id)).then((res) => {
+            setComments(res.data)
+        })
+        api.getTasks(Number(id)).then(function (res) {
+            setTask(res.data)
+        })
+        api.getStatuses().then(function (res) {
+            setStatuses(res.data)
+        })
     }, [id]);
+
+    useEffect(() => {
+        if (task)
+            setSelectedStatus(task.status)
+    }, [task]);
+
+    async function handleStatusChange(e: React.ChangeEvent<HTMLSelectElement>) {
+        const val = Number(e.target.value)
+        const oldStatus = selectedStatus
+        setSelectedStatus(statuses.find(stat => stat.id === val))
+
+        if (task) {
+            try {
+                await api.changeTaskStatus({
+                    id: task.id,
+                    status_id: val
+                });
+            } catch (error) {
+                console.error("Error creating employee", error);
+                setSelectedStatus(oldStatus)
+            }
+        }
+    }
 
     return (
         <>
@@ -46,45 +78,46 @@ export function SingleTask() {
                         <div className='w-[493px] h-[277px] flex flex-col gap-[18px]'>
                             <h1 className='text-2xl font-medium py-2.5 h-[49px]'>დავალების დეტალები</h1>
                             <div className='flex flex-col h-[210px]'>
-                                <div className='flex gap-[70px] items-center h-1/3'>
+                                <div className='flex gap-[70px] items-center justify-between h-1/3'>
                                     <div className='flex items-center justify-start gap-1.5 w-[164px]'>
                                         <PieChart/>
                                         <span>სტატუსი</span>
                                     </div>
-                                    <div>
-                                        <Dropdown title={String(task.status.name)}
-                                                  mainDivClassName='w-[259px] h-[45px] border border-[#CED4DA] rounded-[5px] justify-start p-[14px]'
-                                                  childClassName='w-full left-0 rounded-[5px] border-[#CED4DA]'
-                                                  titleClassName='text-sm font-light text-[#0D0F10] w-full justify-between'
-                                                  icon={<ChevronArrowDown/>}
+                                    <div className="relative w-fit ">
+                                        <Select
+                                            name="status"
+                                            onChange={handleStatusChange}
+                                            value={selectedStatus?.id}
+                                            className={'border-[#DEE2E6] cursor-pointer text-sm rounded-[5px] border w-[260px] p-[14px] h-[45px] appearance-none '}
                                         >
-                                            <div className='flex flex-col gap-5'>
-                                                <CheckBox
-                                                    label={'დაბალი'}
-                                                />
-                                                <CheckBox
-                                                    label={'საშუალო'}
-                                                />
-                                                <CheckBox
-                                                    label={'მაღალი'}
-                                                />
-                                            </div>
-                                        </Dropdown>
+                                            {
+                                                statuses.map((status) => (
+                                                    <option key={'status' + status.id}
+                                                            value={status.id}>{status.name}</option>
+                                                ))
+                                            }
+                                        </Select>
+                                        <DownArrow
+                                            className="group pointer-events-none absolute top-[14px] right-[14px]"
+                                            aria-hidden="true"
+                                        />
                                     </div>
                                 </div>
 
-                                <div className='flex gap-[70px] items-center h-1/3'>
-                                    <div className='flex items-center justify-start gap-1.5 w-[164px]'>
+                                <div className='flex gap-[70px] items-center justify-between h-1/3'>
+                                    <div className='flex items-center justify-start gap-1.5'>
                                         <User/>
                                         <span>თანამშრომელი</span>
                                     </div>
-                                    <div className='flex flex-col'>
-                                        <p className='text-[11px] font-light justify-end text-[#474747]'>{task.department.name}</p>
-                                        <div className='flex gap-3'>
-                                            <img src={task.employee.avatar} alt={'img'} className='w-8'/>
-                                            <p className='text-[#0D0F10] leading-[150%] text-sm'>{task.employee.name}</p>
+                                    <div className='flex gap-3 items-center'>
+                                        <img src={task.employee.avatar} alt={'img'} className='w-8 h-8 rounded-full object-cover'/>
 
+                                        <div className='flex flex-col'>
+                                            <p className='text-[11px] font-light justify-end text-[#474747]'>{task.department.name}</p>
+
+                                            <p className='text-[#0D0F10] leading-[150%] text-sm'>{task.employee.name}</p>
                                         </div>
+
                                     </div>
                                 </div>
 
@@ -116,7 +149,7 @@ export function SingleTask() {
 
                         <div className='flex flex-col gap-10'>
                             <h3 className='font-medium text-xl flex gap-[7px]'>კომენტარები <span
-                                className='bg-[#8338EC] w-[30px] rounded-[30px] p-2.5 text-white'>{task.total_comments}</span>
+                                className='bg-[#8338EC] w-[30px] rounded-[30px] p-2.5 text-white'>{comments.length}</span>
                             </h3>
 
                             <div className='flex gap-3'>
@@ -124,9 +157,12 @@ export function SingleTask() {
                                 <div>
                                     <h3 className='text-[#212529] font-medium text-lg mb-2'>{task.employee.name}</h3>
                                     <p className='text-[#343A40] text-[16px] font-[350] mb-2.5'>comment</p>
-                                    <button className='flex text-[#8338EC] text-xs font-normal gap-[6px]'><LeftArrow/> უპასუხე</button>
+                                    <button className='flex text-[#8338EC] text-xs font-normal gap-[6px]'>
+                                        <LeftArrow/> უპასუხე
+                                    </button>
                                 </div>
                             </div>
+
                         </div>
 
                     </div>
