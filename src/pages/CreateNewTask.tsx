@@ -68,11 +68,18 @@ export const CreateNewTask = () => {
         },
         validationSchema: Yup.object({
             name: Yup.string()
-                .min(2, 'მინიმუმ 2 სიმბოლო.')
+                .min(3, 'მინიმუმ 3 სიმბოლო.')
                 .max(255, 'მაქსიმუმ 255 სიმბოლო.')
                 .required('სახელი სავალდებულოა.'),
             description: Yup.string()
-                .min(2, 'მინიმუმ 2 სიმბოლო.')
+                .test(
+                    'min-words',
+                    'მინიმუმ 4 სიტყვა.',
+                    (value) => {
+                        if (!value) return true; 
+                        return value.trim().split(/\s+/).length >= 4;
+                    }
+                )
                 .max(255, 'მაქსიმუმ 255 სიმბოლო.'),
             priority: Yup.string().required('პრიორიტეტი სავალდებულოა.'),
             status: Yup.string().required('სტატუსი სავალდებულოა.'),
@@ -145,9 +152,9 @@ export const CreateNewTask = () => {
                                    className={(formik.touched.name && formik.errors.name ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + " text-sm w-full rounded-[5px] border p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none"}/>
                             <div className="mt-[6px] flex flex-col text-start">
                                 <ValidationHint
-                                    isValid={formik.values.name.length >= 2}
+                                    isValid={formik.values.name.length >= 3}
                                     isTouched={formik.touched.name ?? false}
-                                    message="მინიმუმ 2 სიმბოლო."
+                                    message="მინიმუმ 3 სიმბოლო."
                                 />
                                 <ValidationHint
                                     isValid={formik.values.name.length <= 255 && formik.values.name.length > 0}
@@ -197,9 +204,9 @@ export const CreateNewTask = () => {
                                       className={(formik.touched.description && formik.errors.description ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + " text-sm w-full rounded-[5px] border p-[14px] h-[133px] bg-[#FFFFFF] focus:outline-none"}/>
                             <div className="mt-[6px] flex flex-col text-start">
                                 <ValidationHint
-                                    isValid={formik.values.description.length >= 2}
+                                    isValid={formik.values.description.trim().split(/\s+/).length >= 4}
                                     isTouched={formik.touched.description ?? false}
-                                    message="მინიმუმ 2 სიმბოლო."
+                                    message="მინიმუმ 4 სიტყვა."
                                 />
                                 <ValidationHint
                                     isValid={formik.values.description.length <= 255 && formik.values.description.length > 0}
