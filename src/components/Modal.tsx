@@ -6,6 +6,8 @@ import {Check} from "../assets/icons/Check.tsx";
 import {useDropzone} from "react-dropzone";
 import {Trash} from "../assets/icons/Trash.tsx";
 import {DownArrow} from "../assets/icons/DownArrow.tsx";
+import {useFormik} from "formik";
+import * as Yup from 'yup';
 
 
 interface ModalProps {
@@ -15,34 +17,69 @@ interface ModalProps {
 
 export default function Modal({isOpen, closeModal}: ModalProps) {
 
-    const [imagePreview, setImagePreview] = useState<string | null>(null);
+    const [imageFile, setImageFile] = useState<File | null>(null)
+    const [imagePreview, setImagePreview] = useState<string | null>(null)
 
-    const {
-        getRootProps,
-        getInputProps
-    } = useDropzone({
+    // Validation
+    const formik = useFormik({
+        initialValues: {
+            firstName: '',
+            lastName: '',
+            department: '',
+            avatar: null,
+        },
+        validationSchema: Yup.object({
+            firstName: Yup.string()
+                .min(2, 'მინიმუმ 2 სიმბოლო.')
+                .max(255, 'მაქსიმუმ 255 სიმბოლო.')
+                .required('სახელი სავალდებულოა.'),
+            lastName: Yup.string()
+                .min(2, 'მინიმუმ 2 სიმბოლო.')
+                .max(255, 'მაქსიმუმ 255 სიმბოლო.')
+                .required('გვარი სავალდებულოა.'),
+            department: Yup.string().required('დეპარტამენტი სავალდებულოა.'),
+            avatar: Yup.mixed().required('ავატარის ატვირთვა სავალდებულოა.'),
+        }),
+        onSubmit: (values) => {
+            console.log('🦄 Submitted:', values)
+            handleClose()
+        }
+    })
+
+
+    const {getRootProps, getInputProps} = useDropzone({
         accept: {
             'image/jpeg': [],
             'image/png': []
         },
-        maxFiles: 1, // Limit to 1 file
+        maxFiles: 1,
         onDrop: (acceptedFiles) => {
-            // Show preview of the uploaded image
-            const file = acceptedFiles[0];
+            const file = acceptedFiles[0]
             if (file) {
-                const objectUrl = URL.createObjectURL(file);
-                setImagePreview(objectUrl);
+                setImageFile(file)
+                setImagePreview(URL.createObjectURL(file))
+                formik.setFieldValue('avatar', file)
             }
         }
-    });
-
+    })
 
     const handleImageRemove = () => {
+        setImagePreview(null)
+        setImageFile(null)
+        formik.setFieldValue('avatar', null)
+    }
+
+
+    const handleClose = () => {
+        formik.resetForm();
         setImagePreview(null);
+        setImageFile(null);
+        closeModal();
     };
 
+
     return (
-        <Dialog open={isOpen} as="div" className="relative z-10" onClose={closeModal}>
+        <Dialog open={isOpen} as="div" className="relative z-10" onClose={handleClose}>
             <Transition.Child
                 as={Fragment}
                 enter="ease-out duration-300"
@@ -68,7 +105,7 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                     >
                         <Dialog.Panel
                             className="h-[766px] w-[913px] rounded-[10px] px-[50px] pt-10 pb-[60px] bg-white flex flex-col gap-[37px]">
-                            <div className="flex justify-end cursor-pointer" onClick={closeModal}>
+                            <div className="flex justify-end cursor-pointer" onClick={handleClose}>
                                 <Cancel/>
                             </div>
 
@@ -77,7 +114,7 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                     თანამშრომლის დამატება
                                 </Dialog.Title>
 
-                                <div className='h-[439px] flex flex-col w-full gap-[45px]'>
+                                <form onSubmit={formik.handleSubmit} className='h-[439px] flex flex-col w-full gap-[45px]'>
 
                                     <div className='flex justify-between gap-[45px]'>
                                         <Field className="flex-1/2">
@@ -85,15 +122,31 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                 სახელი <Asterisk className="mt-[3px]"/>
                                             </Label>
                                             <Input required={true}
-                                                   className="text-sm w-full rounded-[5px] border border-[#DEE2E6] p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none"/>
+                                                   name="firstName"
+                                                   value={formik.values.firstName}
+                                                   onChange={formik.handleChange}
+                                                   onBlur={formik.handleBlur}
+                                                   className={ (formik.touched.firstName && formik.errors.firstName ? "border-[#FA4D4D]" : "border-[#DEE2E6]")  + " text-sm w-full rounded-[5px] border p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none"}/>
                                             <div className="mt-[6px] flex flex-col text-start">
-                                                <span className="flex gap-1 items-center text-sm/6 text-[#6C757D]">
-                                                    <Check/>
-                                                    <span>მინიმუმ 2 სიმბოლო.</span>
+                                                <span className={`flex gap-1 items-center text-sm/6 ${
+                                                    formik.values.firstName.length >= 2 ? 'text-[#08A508]' :
+                                                        formik.touched.firstName ? 'text-[#FA4D4D]' : 'text-[#6C757D]'
+                                                }`}>
+                                                  <Check color={
+                                                      formik.values.firstName.length >=2 && formik.values.firstName.length > 0 ? '#08A508' :
+                                                          formik.touched.firstName ? '#FA4D4D' : '#6C757D'
+                                                  }/>
+                                                  <span> მინიმუმ 2 სიმბოლო.</span>
                                                 </span>
-                                                <span className="flex gap-1 items-center text-sm/6 text-[#6C757D]">
-                                                    <Check/>
-                                                    <span>მინიმუმ 255 სიმბოლო</span>
+                                                <span className={`flex gap-1 items-center text-sm/6 ${
+                                                    formik.values.firstName.length <= 255 && formik.values.firstName.length > 0 ? 'text-[#08A508]' :
+                                                        formik.touched.firstName ? 'text-[#FA4D4D]' : 'text-[#6C757D]'
+                                                }`}>
+                                                  <Check color={
+                                                      formik.values.firstName.length <= 255 && formik.values.firstName.length > 0 ? '#08A508' :
+                                                          formik.touched.firstName ? '#FA4D4D' : '#6C757D'
+                                                  }/>
+                                                  <span>მაქსიმუმ 255 სიმბოლო</span>
                                                 </span>
                                             </div>
                                         </Field>
@@ -103,15 +156,31 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                 გვარი <Asterisk className="mt-[3px]"/>
                                             </Label>
                                             <Input required={true}
-                                                   className="text-sm w-full rounded-[5px] border border-[#DEE2E6] p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none"/>
+                                                   name="lastName"
+                                                   value={formik.values.lastName}
+                                                   onChange={formik.handleChange}
+                                                   onBlur={formik.handleBlur}
+                                                   className={ (formik.touched.lastName && formik.errors.lastName ? "border-[#FA4D4D]" : "border-[#DEE2E6]")  + " text-sm w-full rounded-[5px] border p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none"}/>
                                             <div className="mt-[6px] flex flex-col text-start">
-                                                <span className="flex gap-1 items-center text-sm/6 text-[#6C757D]">
-                                                    <Check/>
-                                                    <span>მინიმუმ 2 სიმბოლო.</span>
+                                                <span className={`flex gap-1 items-center text-sm/6 ${
+                                                    formik.values.lastName.length >= 2 ? 'text-[#08A508]' :
+                                                        formik.touched.lastName ? 'text-[#FA4D4D]' : 'text-[#6C757D]'
+                                                }`}>
+                                                  <Check color={
+                                                      formik.values.lastName.length >=2 && formik.values.lastName.length > 0 ? '#08A508' :
+                                                          formik.touched.lastName ? '#FA4D4D' : '#6C757D'
+                                                  }/>
+                                                  <span> მინიმუმ 2 სიმბოლო.</span>
                                                 </span>
-                                                <span className="flex gap-1 items-center text-sm/6 text-[#6C757D]">
-                                                    <Check/>
-                                                    <span>მინიმუმ 255 სიმბოლო</span>
+                                                <span className={`flex gap-1 items-center text-sm/6 ${
+                                                    formik.values.lastName.length <= 255 && formik.values.lastName.length > 0 ? 'text-[#08A508]' :
+                                                        formik.touched.lastName ? 'text-[#FA4D4D]' : 'text-[#6C757D]'
+                                                }`}>
+                                                  <Check color={
+                                                      formik.values.lastName.length <= 255 && formik.values.lastName.length > 0 ? '#08A508' :
+                                                          formik.touched.lastName ? '#FA4D4D' : '#6C757D'
+                                                  }/>
+                                                  <span>მაქსიმუმ 255 სიმბოლო</span>
                                                 </span>
                                             </div>
                                         </Field>
@@ -123,8 +192,8 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                             ავატარი <Asterisk className="mt-[3px]"/>
                                         </label>
                                         <div
-                                            className="dropzone h-[120px] flex flex-col items-center justify-center border border-dashed border-[#CED4DA]" {...getRootProps()}>
-                                            <input required={true} {...getInputProps()} />
+                                            className={(formik.touched.avatar && formik.errors.avatar ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + "dropzone h-[120px] flex flex-col items-center justify-center border border-dashed "} {...getRootProps()}>
+                                            <input {...getInputProps()} />
                                             {imagePreview ? (
                                                 <div className="relative">
                                                     <img src={imagePreview} alt="Preview"
@@ -133,15 +202,20 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                         onClick={(e) => {
                                                             e.stopPropagation()
                                                             handleImageRemove()
-                                                        }} // Remove image when clicked
-                                                        className="cursor-pointer w-[24px] h-[24px] overflow-hidden flex items-center justify-center rounded-full bg-white border border-[#6C757D] absolute bottom-[3px] right-[3px]">
+                                                        }}
+                                                        className="cursor-pointer w-[24px] h-[24px] flex items-center justify-center rounded-full bg-white border border-[#6C757D] absolute bottom-[3px] right-[3px]">
                                                         <Trash/>
                                                     </button>
                                                 </div>
-                                            ) : <>
-                                                <p>Drag 'n' drop some files here, or click to select files</p>
-                                                <em>(Only *.jpeg and *.png images will be accepted)</em>
-                                            </>}
+                                            ) : (
+                                                <>
+                                                    <p>Drag 'n' drop some files here, or click to select files</p>
+                                                    <em>(Only *.jpeg and *.png images will be accepted)</em>
+                                                    {formik.touched.avatar && formik.errors.avatar && (
+                                                        <div className="text-red-500 text-sm mt-1">{formik.errors.avatar}</div>
+                                                    )}
+                                                </>
+                                            )}
                                         </div>
 
                                     </div>
@@ -152,7 +226,11 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                         </Label>
                                         <div className="relative w-fit ">
                                             <Select
-                                                className={'cursor-pointer text-sm w-[384px] rounded-[5px] border border-[#DEE2E6] p-[14px] h-[45px] appearance-none '}
+                                                name="department"
+                                                value={formik.values.department}
+                                                onChange={formik.handleChange}
+                                                onBlur={formik.handleBlur}
+                                                className={ (formik.touched.avatar && formik.errors.avatar ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' cursor-pointer text-sm w-[384px] rounded-[5px] border  p-[14px] h-[45px] appearance-none '}
                                             >
                                                 <option className="text-sm" value="active">Active</option>
                                                 <option className="text-sm" value="22">22</option>
@@ -162,16 +240,19 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                 aria-hidden="true"
                                             />
                                         </div>
+                                        {formik.touched.department && formik.errors.department && (
+                                            <div className="text-red-500 text-sm mt-1">{formik.errors.department}</div>
+                                        )}
                                     </Field>
 
-                                </div>
+                                </form>
                             </div>
 
                             <div className="flex justify-end gap-[22px]">
                                 <button
                                     type="button"
                                     className="inline-flex justify-center rounded-md border border-[#8338EC]  px-4 py-2 text-sm font-medium text-[#343A40] cursor-pointer"
-                                    onClick={closeModal}
+                                    onClick={handleClose}
                                 >
                                     გაუქმება
                                 </button>
@@ -179,7 +260,6 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                 <button
                                     type="button"
                                     className="inline-flex justify-center rounded-md border border-transparent bg-[#8338EC]  px-4 py-2 text-sm font-medium text-white cursor-pointer"
-                                    onClick={closeModal}
                                 >
                                     დაამატე თანამშრომელი
                                 </button>
