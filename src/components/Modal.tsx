@@ -86,11 +86,6 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                         return;
                     }
 
-                    if (img.width > 500 || img.height > 500) {
-                        formik.setFieldError('avatar', 'სურათის ზომა არ უნდა აღემატებოდეს 500x500px-ს.');
-                        return;
-                    }
-
                     setImagePreview(URL.createObjectURL(file));
                     formik.setFieldValue('avatar', file);
                 };
