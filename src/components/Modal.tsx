@@ -2,7 +2,6 @@ import {Input, Dialog, Field, Label, Transition, Select} from '@headlessui/react
 import {Fragment, useEffect, useState} from 'react'
 import {Cancel} from "../assets/icons/Cancel.tsx";
 import {Asterisk} from "../assets/icons/Asterisk.tsx";
-import {Check} from "../assets/icons/Check.tsx";
 import {useDropzone} from "react-dropzone";
 import {Trash} from "../assets/icons/Trash.tsx";
 import {DownArrow} from "../assets/icons/DownArrow.tsx";
@@ -13,6 +12,7 @@ import {api} from "../classes/API.ts";
 import { useDispatch } from 'react-redux'
 import type { AppDispatch } from '../store/store'
 import { addEmployee } from '../store/slices/employeesSlice'
+import { ValidationHint } from "./ValidationHint.tsx";
 
 
 interface ModalProps {
@@ -168,26 +168,16 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                    onBlur={formik.handleBlur}
                                                    className={ (formik.touched.firstName && formik.errors.firstName ? "border-[#FA4D4D]" : "border-[#DEE2E6]")  + " text-sm w-full rounded-[5px] border p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none"}/>
                                             <div className="mt-[6px] flex flex-col text-start">
-                                                <span className={`flex gap-1 items-center text-sm/6 ${
-                                                    formik.values.firstName.length >= 2 ? 'text-[#08A508]' :
-                                                        formik.touched.firstName ? 'text-[#FA4D4D]' : 'text-[#6C757D]'
-                                                }`}>
-                                                  <Check color={
-                                                      formik.values.firstName.length >=2 && formik.values.firstName.length > 0 ? '#08A508' :
-                                                          formik.touched.firstName ? '#FA4D4D' : '#6C757D'
-                                                  }/>
-                                                  <span> მინიმუმ 2 სიმბოლო.</span>
-                                                </span>
-                                                <span className={`flex gap-1 items-center text-sm/6 ${
-                                                    formik.values.firstName.length <= 255 && formik.values.firstName.length > 0 ? 'text-[#08A508]' :
-                                                        formik.touched.firstName ? 'text-[#FA4D4D]' : 'text-[#6C757D]'
-                                                }`}>
-                                                  <Check color={
-                                                      formik.values.firstName.length <= 255 && formik.values.firstName.length > 0 ? '#08A508' :
-                                                          formik.touched.firstName ? '#FA4D4D' : '#6C757D'
-                                                  }/>
-                                                  <span>მაქსიმუმ 255 სიმბოლო</span>
-                                                </span>
+                                                <ValidationHint
+                                                    isValid={formik.values.firstName.length >= 2}
+                                                    isTouched={formik.touched.firstName ?? false}
+                                                    message="მინიმუმ 2 სიმბოლო."
+                                                />
+                                                <ValidationHint
+                                                    isValid={formik.values.firstName.length <= 255 && formik.values.firstName.length > 0}
+                                                    isTouched={formik.touched.firstName ?? false}
+                                                    message="მაქსიმუმ 255 სიმბოლო"
+                                                />
                                             </div>
                                         </Field>
 
@@ -202,26 +192,16 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                    onBlur={formik.handleBlur}
                                                    className={ (formik.touched.lastName && formik.errors.lastName ? "border-[#FA4D4D]" : "border-[#DEE2E6]")  + " text-sm w-full rounded-[5px] border p-[14px] h-[45px] bg-[#FFFFFF] focus:outline-none"}/>
                                             <div className="mt-[6px] flex flex-col text-start">
-                                                <span className={`flex gap-1 items-center text-sm/6 ${
-                                                    formik.values.lastName.length >= 2 ? 'text-[#08A508]' :
-                                                        formik.touched.lastName ? 'text-[#FA4D4D]' : 'text-[#6C757D]'
-                                                }`}>
-                                                  <Check color={
-                                                      formik.values.lastName.length >=2 && formik.values.lastName.length > 0 ? '#08A508' :
-                                                          formik.touched.lastName ? '#FA4D4D' : '#6C757D'
-                                                  }/>
-                                                  <span> მინიმუმ 2 სიმბოლო.</span>
-                                                </span>
-                                                <span className={`flex gap-1 items-center text-sm/6 ${
-                                                    formik.values.lastName.length <= 255 && formik.values.lastName.length > 0 ? 'text-[#08A508]' :
-                                                        formik.touched.lastName ? 'text-[#FA4D4D]' : 'text-[#6C757D]'
-                                                }`}>
-                                                  <Check color={
-                                                      formik.values.lastName.length <= 255 && formik.values.lastName.length > 0 ? '#08A508' :
-                                                          formik.touched.lastName ? '#FA4D4D' : '#6C757D'
-                                                  }/>
-                                                  <span>მაქსიმუმ 255 სიმბოლო</span>
-                                                </span>
+                                                <ValidationHint
+                                                    isValid={formik.values.lastName.length >= 2}
+                                                    isTouched={formik.touched.lastName ?? false}
+                                                    message="მინიმუმ 2 სიმბოლო."
+                                                />
+                                                <ValidationHint
+                                                    isValid={formik.values.lastName.length <= 255 && formik.values.lastName.length > 0}
+                                                    isTouched={formik.touched.lastName ?? false}
+                                                    message="მაქსიმუმ 255 სიმბოლო"
+                                                />
                                             </div>
                                         </Field>
 
