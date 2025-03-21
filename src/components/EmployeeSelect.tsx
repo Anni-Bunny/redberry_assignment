@@ -40,8 +40,8 @@ export function EmployeeSelect({
                                     className="w-6 h-6 rounded-full object-cover"
                                 />
                                 <span className="truncate">
-                  {selectedEmployee.name} {selectedEmployee.surname}
-                </span>
+                                  {selectedEmployee.name} {selectedEmployee.surname}
+                                </span>
                             </div>
                         ) : (
                             <span className="text-gray-400">Select employee</span>

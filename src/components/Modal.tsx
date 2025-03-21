@@ -208,9 +208,9 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                     </div>
 
                                     <div>
-                                        <label className="text-sm/6 font-medium text-[#343A40] flex">
+                                        <Label className="text-sm/6 font-medium text-[#343A40] flex">
                                             ავატარი <Asterisk className="mt-[3px]"/>
-                                        </label>
+                                        </Label>
                                         <div
                                             className={(formik.touched.avatar && formik.errors.avatar ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + " dropzone h-[120px] flex flex-col items-center justify-center border border-dashed "} {...getRootProps()}>
                                             <input {...getInputProps()} />

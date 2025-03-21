@@ -16,9 +16,9 @@ export function ValidationHint({ isValid, isTouched, message }: ValidationHintPr
     const color = getColor();
 
     return (
-        <span className={`flex gap-1 items-center text-[10px] text-[${color}]`}>
-      <Check color={color} />
-      <span>{message}</span>
-    </span>
+        <span className={`font-light flex gap-1 items-center text-[10px] text-[${color}]`}>
+          <Check color={color} />
+          <span>{message}</span>
+        </span>
     );
 }

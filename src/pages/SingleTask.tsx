@@ -105,7 +105,7 @@ export function SingleTask() {
                         <div className='w-[493px] h-[277px] flex flex-col gap-[18px]'>
                             <h1 className='text-2xl font-medium py-2.5 h-[49px]'>დავალების დეტალები</h1>
                             <div className='flex flex-col h-[210px]'>
-                                <div className='flex gap-[70px] items-center justify-between h-1/3'>
+                                <div className='flex gap-[70px] items-center h-1/3'>
                                     <div className='flex items-center justify-start gap-1.5 w-[164px]'>
                                         <PieChart/>
                                         <span>სტატუსი</span>
@@ -131,8 +131,8 @@ export function SingleTask() {
                                     </div>
                                 </div>
 
-                                <div className='flex gap-[70px] items-center justify-between h-1/3'>
-                                    <div className='flex items-center justify-start gap-1.5'>
+                                <div className='flex gap-[70px] items-center h-1/3'>
+                                    <div className='flex items-center justify-start gap-1.5 w-[164px]'>
                                         <User/>
                                         <span>თანამშრომელი</span>
                                     </div>

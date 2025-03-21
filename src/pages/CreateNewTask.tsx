@@ -142,7 +142,7 @@ export const CreateNewTask = () => {
 
                     <div className="gap-[161px] flex justify-between">
                         <Field className="flex-1">
-                            <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                            <Label className="text-[16px] font-medium text-[#343A40] flex">
                                 სახელი <Asterisk className="mt-[3px]"/>
                             </Label>
                             <Input name="name"
@@ -165,7 +165,7 @@ export const CreateNewTask = () => {
                         </Field>
 
                         <Field className="flex-1">
-                            <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                            <Label className="text-[16px] font-medium text-[#343A40] flex">
                                 დეპარტამენტი <Asterisk className="mt-[3px]"/>
                             </Label>
                             <div className="relative w-full ">
@@ -194,7 +194,7 @@ export const CreateNewTask = () => {
 
                     <div className="gap-[161px] flex justify-between">
                         <Field className="flex-1">
-                            <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                            <Label className="text-[16px] font-medium text-[#343A40] flex">
                                 აღწერა
                             </Label>
                             <Textarea name="description"
@@ -217,7 +217,7 @@ export const CreateNewTask = () => {
                         </Field>
 
                         <Field className="flex-1">
-                            <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                            <Label className="text-[16px] font-medium text-[#343A40] flex">
                                 პასუხისმგებელი თანამშრომელი <Asterisk className="mt-[3px]"/>
                             </Label>
                             <EmployeeSelect
@@ -234,7 +234,7 @@ export const CreateNewTask = () => {
                     <div className="gap-[161px] flex justify-between">
                         <div className="flex gap-[32px] flex-1">
                             <Field className="flex flex-col">
-                                <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                                <Label className="text-[16px] font-medium text-[#343A40] flex">
                                     პრიორიტეტი <Asterisk className="mt-[3px]"/>
                                 </Label>
                                 <div className="relative w-fit ">
@@ -262,7 +262,7 @@ export const CreateNewTask = () => {
                             </Field>
 
                             <Field className="flex flex-col">
-                                <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                                <Label className="text-[16px] font-medium text-[#343A40] flex">
                                     სტატუსი <Asterisk className="mt-[3px]"/>
                                 </Label>
                                 <div className="relative w-fit ">
@@ -291,7 +291,7 @@ export const CreateNewTask = () => {
 
                         <div className="flex-1">
                             <Field className="flex flex-col">
-                                <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                                <Label className="text-[16px] font-medium text-[#343A40] flex">
                                     დედლაინი <Asterisk className="mt-[3px]"/>
                                 </Label>
                                 <div className="relative w-fit ">
