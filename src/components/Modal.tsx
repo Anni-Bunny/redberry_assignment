@@ -1,5 +1,5 @@
 import {Input, Dialog, Field, Label, Transition, Select} from '@headlessui/react'
-import {Fragment, useState} from 'react'
+import {Fragment, useEffect, useState} from 'react'
 import {Cancel} from "../assets/icons/Cancel.tsx";
 import {Asterisk} from "../assets/icons/Asterisk.tsx";
 import {Check} from "../assets/icons/Check.tsx";
@@ -8,6 +8,8 @@ import {Trash} from "../assets/icons/Trash.tsx";
 import {DownArrow} from "../assets/icons/DownArrow.tsx";
 import {useFormik} from "formik";
 import * as Yup from 'yup';
+import {Department} from "../interfaces/department.ts";
+import {api} from "../classes/API.ts";
 
 
 interface ModalProps {
@@ -19,6 +21,7 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
 
     const [imageFile, setImageFile] = useState<File | null>(null)
     const [imagePreview, setImagePreview] = useState<string | null>(null)
+    const [departments, setDeepartments] = useState<Department[]>([])
 
     // Validation
     const formik = useFormik({
@@ -76,6 +79,18 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
         setImageFile(null);
         closeModal();
     };
+
+
+    useEffect(() => {
+        api.getDepartments().then(res => {
+            setDeepartments(res.data)
+        })
+    }, [])
+
+
+    function createEmployee() {
+
+    }
 
 
     return (
@@ -232,8 +247,11 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                 onBlur={formik.handleBlur}
                                                 className={ (formik.touched.avatar && formik.errors.avatar ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' cursor-pointer text-sm w-[384px] rounded-[5px] border  p-[14px] h-[45px] appearance-none '}
                                             >
-                                                <option className="text-sm" value="active">Active</option>
-                                                <option className="text-sm" value="22">22</option>
+                                                {
+                                                    departments.map((department) => (
+                                                        <option key={department.id} value={department.id}>{department.name}</option>
+                                                    ))
+                                                }
                                             </Select>
                                             <DownArrow
                                                 className="group pointer-events-none absolute top-[14px] right-[14px]"
