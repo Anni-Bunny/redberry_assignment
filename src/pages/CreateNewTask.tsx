@@ -19,6 +19,7 @@ import {EmployeeSelect} from "../components/EmployeeSelect.tsx";
 import DatePicker from 'react-datepicker';
 import 'react-datepicker/dist/react-datepicker.css';
 import { useNavigate } from 'react-router-dom';
+import {PrioritySelect} from "../components/PrioritySelect.tsx";
 
 export const CreateNewTask = () => {
 
@@ -174,12 +175,12 @@ export const CreateNewTask = () => {
                                     value={formik.values.department}
                                     onChange={formik.handleChange}
                                     onBlur={formik.handleBlur}
-                                    className={(formik.touched.department && formik.errors.department ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' cursor-pointer text-sm rounded-[5px] border w-full  p-[14px] h-[45px] appearance-none '}
+                                    className={(formik.touched.department && formik.errors.department ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' text-[14px] font-light cursor-pointer text-sm rounded-[5px] border w-full  p-[14px] h-[45px] appearance-none '}
                                 >
                                     <option></option>
                                     {
                                         departments.map((department) => (
-                                            <option key={department.id}
+                                            <option className="text-[14px] font-light" key={department.id}
                                                     value={department.id}>{department.name}</option>
                                         ))
                                     }
@@ -235,31 +236,18 @@ export const CreateNewTask = () => {
                         <div className="flex gap-[32px] flex-1">
                             <Field className="flex flex-col">
                                 <Label className="text-[16px] font-medium text-[#343A40] flex">
-                                    პრიორიტეტი <Asterisk className="mt-[3px]"/>
+                                    პრიორიტეტი <Asterisk className="mt-[3px]" />
                                 </Label>
-                                <div className="relative w-fit ">
-                                    <Select
-                                        required={true}
-                                        name="priority"
-                                        value={formik.values.priority}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        className={(formik.touched.priority && formik.errors.priority ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' cursor-pointer text-sm  w-[260px] rounded-[5px] border  p-[14px] h-[45px] appearance-none '}
-                                    >
-                                        <option></option>
-                                        {
-                                            priorities.map((priority) => (
-                                                <option key={'priority_' + priority.id}
-                                                        value={priority.id}>{priority.name}</option>
-                                            ))
-                                        }
-                                    </Select>
-                                    <DownArrow
-                                        className="group pointer-events-none absolute top-[14px] right-[14px]"
-                                        aria-hidden="true"
-                                    />
-                                </div>
+                                <PrioritySelect
+                                    value={formik.values.priority ? Number(formik.values.priority) : 2}
+                                    onChange={(val) => formik.setFieldValue('priority', String(val))}
+                                    onBlur={() => formik.setFieldTouched('priority', true)}
+                                    touched={formik.touched.priority}
+                                    error={formik.errors.priority as string}
+                                    priorities={priorities}
+                                />
                             </Field>
+
 
                             <Field className="flex flex-col">
                                 <Label className="text-[16px] font-medium text-[#343A40] flex">
@@ -271,12 +259,12 @@ export const CreateNewTask = () => {
                                         value={formik.values.status}
                                         onChange={formik.handleChange}
                                         onBlur={formik.handleBlur}
-                                        className={(formik.touched.status && formik.errors.status ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' cursor-pointer text-sm rounded-[5px] border w-[260px] p-[14px] h-[45px] appearance-none '}
+                                        className={(formik.touched.status && formik.errors.status ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' text-[14px] font-light cursor-pointer text-sm rounded-[5px] border w-[260px] p-[14px] h-[45px] appearance-none '}
                                     >
                                         <option></option>
                                         {
                                             statuses.map((status) => (
-                                                <option key={'status' + status.id}
+                                                <option className="text-[14px] font-light" key={'status' + status.id}
                                                         value={status.id}>{status.name}</option>
                                             ))
                                         }

@@ -208,9 +208,9 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                     </div>
 
                                     <div>
-                                        <Label className="text-sm/6 font-medium text-[#343A40] flex">
+                                        <label className="text-sm/6 font-medium text-[#343A40] flex">
                                             ავატარი <Asterisk className="mt-[3px]"/>
-                                        </Label>
+                                        </label>
                                         <div
                                             className={(formik.touched.avatar && formik.errors.avatar ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + " dropzone h-[120px] flex flex-col items-center justify-center border border-dashed "} {...getRootProps()}>
                                             <input {...getInputProps()} />
@@ -250,12 +250,12 @@ export default function Modal({isOpen, closeModal}: ModalProps) {
                                                 value={formik.values.department}
                                                 onChange={formik.handleChange}
                                                 onBlur={formik.handleBlur}
-                                                className={ (formik.touched.department && formik.errors.department ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' cursor-pointer text-sm w-[384px] rounded-[5px] border  p-[14px] h-[45px] appearance-none '}
+                                                className={ (formik.touched.department && formik.errors.department ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' text-[14px] font-light cursor-pointer text-sm w-[384px] rounded-[5px] border  p-[14px] h-[45px] appearance-none '}
                                             >
                                                 <option></option>
                                                 {
                                                     departments.map((department) => (
-                                                        <option key={department.id} value={department.id}>{department.name}</option>
+                                                        <option className="text-[14px] font-light" key={department.id} value={department.id}>{department.name}</option>
                                                     ))
                                                 }
                                             </Select>

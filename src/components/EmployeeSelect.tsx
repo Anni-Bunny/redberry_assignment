@@ -39,7 +39,7 @@ export function EmployeeSelect({
                                     alt={`${selectedEmployee.name} ${selectedEmployee.surname}`}
                                     className="w-6 h-6 rounded-full object-cover"
                                 />
-                                <span className="truncate">
+                                <span className="text-[14px] font-light truncate">
                                   {selectedEmployee.name} {selectedEmployee.surname}
                                 </span>
                             </div>
@@ -68,7 +68,7 @@ export function EmployeeSelect({
                                             alt={`${employee.name} ${employee.surname}`}
                                             className="w-6 h-6 rounded-full object-cover"
                                         />
-                                        <span>{employee.name} {employee.surname}</span>
+                                        <span className="text-[14px] font-light" >{employee.name} {employee.surname}</span>
                                     </li>
                                 )}
                             </Listbox.Option>
