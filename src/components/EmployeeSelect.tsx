@@ -44,7 +44,7 @@ export function EmployeeSelect({
                                 </span>
                             </div>
                         ) : (
-                            <span className="text-gray-400">Select employee</span>
+                            <span className="text-gray-400"></span>
                         )}
                         <DownArrow className="pointer-events-none absolute top-[14px] right-[14px]"/>
                     </Listbox.Button>
@@ -76,9 +76,6 @@ export function EmployeeSelect({
                     </Listbox.Options>
                 </div>
             </Listbox>
-            {touched && error && (
-                <p className="text-sm text-[#FA4D4D] mt-1">{error}</p>
-            )}
         </div>
     )
 }

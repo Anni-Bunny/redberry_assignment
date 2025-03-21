@@ -239,7 +239,7 @@ export const CreateNewTask = () => {
                                     პრიორიტეტი <Asterisk className="mt-[3px]" />
                                 </Label>
                                 <PrioritySelect
-                                    value={formik.values.priority ? Number(formik.values.priority) : 2}
+                                    value={Number(formik.values.priority)}
                                     onChange={(val) => formik.setFieldValue('priority', String(val))}
                                     onBlur={() => formik.setFieldTouched('priority', true)}
                                     touched={formik.touched.priority}
