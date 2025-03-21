@@ -2,7 +2,7 @@ import {Container} from "../components/Container.tsx";
 import {Dropdown} from "../components/DropDown.tsx";
 import {ChevronArrowDown} from "../assets/icons/ChevronArrowDown.tsx";
 import {CheckBox} from "../components/Checkbox.tsx";
-import {useCallback, useEffect, useMemo, useState} from "react";
+import {useCallback, useEffect, useMemo, useRef, useState} from "react";
 import {api} from "../classes/API.ts";
 import {Task} from "../interfaces/Task.ts";
 import {Status} from "../interfaces/Status.ts";
@@ -84,16 +84,24 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
         localStorage.setItem('filters', JSON.stringify(filters));
     }, [filters]);
 
+    const filtersRef = useRef(filters);
+
+    useEffect(() => {
+        filtersRef.current = filters;
+    }, [filters]);
+
     function handleClickOutside(type: string) {
+        const currentFilters = filtersRef.current;
+
         switch (type) {
             case "department":
-                setSelectedDepartments(() => filters.departments)
+                setSelectedDepartments(() => currentFilters.departments)
                 break
             case "employee":
-                setSelectedEmployee(() => filters.employee)
+                setSelectedEmployee(() => currentFilters.employee)
                 break
             case "priority":
-                setSelectedPriorities(() => filters.priorities)
+                setSelectedPriorities(() => currentFilters.priorities)
                 break
         }
     }
@@ -141,7 +149,6 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
         // Filter employees by departments
         if (updatedEmployee && updatedDepartments.length && !depChecked(updatedEmployee.department.id)) {
             updatedEmployee = null
-            setSelectedEmployee(null);
         }
 
         setFilters({
@@ -212,6 +219,7 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
 
                     <Dropdown title={'დეპარტამენტი'} icon={<ChevronArrowDown/>}
                               outsideClickCallback={() => handleClickOutside('department')}
+                              chooseCallback={handleFilterByDepartments}
                               childClassName='left-0 w-[688px] rounded-[10px] border-[#8338EC] pt-10 pb-5 px-[30px] gap-[25px]'
                               mainDivClassName='w-full'>
                         <div className='flex flex-col gap-[22px]'>
@@ -222,15 +230,11 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
                                           label={department.name}/>
                             ))}
                         </div>
-                        <div className='flex justify-end'>
-                            <button onClick={() => handleFilterByDepartments()}
-                                    className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
-                            </button>
-                        </div>
                     </Dropdown>
 
                     <Dropdown title={'პრიორიტეტი'} icon={<ChevronArrowDown/>} mainDivClassName='w-full'
                               outsideClickCallback={() => handleClickOutside('priority')}
+                              chooseCallback={handleFilterByPriorities}
                               childClassName='w-[688px] rounded-[10px] border-[#8338EC] pt-10 pb-5 px-[30px] gap-[25px]'>
                         <div className='flex flex-col gap-[22px]'>
                             {priorities.map(priority => (
@@ -240,15 +244,11 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
                                           label={priority.name}/>
                             ))}
                         </div>
-                        <div className='flex justify-end'>
-                            <button onClick={() => handleFilterByPriorities()}
-                                    className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
-                            </button>
-                        </div>
                     </Dropdown>
 
                     <Dropdown title={'თანამშრომელი'} icon={<ChevronArrowDown/>}
                               outsideClickCallback={() => handleClickOutside('employee')}
+                              chooseCallback={HandleFilterByEmployee}
                               childClassName='right-0 w-[688px] rounded-[10px] border-[#8338EC] pt-10 pb-5 px-[30px] gap-[25px]'
                               mainDivClassName='w-full'>
                         <div className='flex flex-col gap-[22px]'>
@@ -259,11 +259,6 @@ export const AllTasks = ({lastVisitedUrl}: { lastVisitedUrl?: string | null }) =
                                           image={employee.avatar}
                                           label={employee.name + ' ' + employee.surname}/>
                             ))}
-                        </div>
-                        <div className='flex justify-end'>
-                            <button onClick={() => HandleFilterByEmployee()}
-                                    className='cursor-pointer w-[155px] h-[35px] rounded-[20px] bg-[#8338EC] py-2 px-5 text-white flex justify-center items-center'>არჩევა
-                            </button>
                         </div>
                     </Dropdown>
                 </div>
