@@ -49,8 +49,8 @@ class API {
         return this.axios.get('/tasks' + (id ? `/${id}` : ''));
     }
 
-    public createTask() {
-        return this.axios.post('/tasks', {});
+    public createTask(data:FormData) {
+        return this.axios.post('/tasks', data);
     }
 
     public changeTaskStatus({id, status_id}: { id: number, status_id: number }) {

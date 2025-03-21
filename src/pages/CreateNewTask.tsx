@@ -16,9 +16,13 @@ import {loadEmployees} from "../store/slices/employeesSlice.ts";
 import {Employee} from "../interfaces/employee.ts";
 import {Calendar} from "../assets/icons/Calendar.tsx";
 import {EmployeeSelect} from "../components/EmployeeSelect.tsx";
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+import { useNavigate } from 'react-router-dom';
 
 export const CreateNewTask = () => {
 
+    const navigate = useNavigate();
     const dispatch = useDispatch<AppDispatch>()
 
     const [statuses, setStatuses] = useState<Status[]>([])
@@ -67,8 +71,7 @@ export const CreateNewTask = () => {
                 .required('სახელი სავალდებულოა.'),
             description: Yup.string()
                 .min(2, 'მინიმუმ 2 სიმბოლო.')
-                .max(255, 'მაქსიმუმ 255 სიმბოლო.')
-                .required('სახელი სავალდებულოა.'),
+                .max(255, 'მაქსიმუმ 255 სიმბოლო.'),
             priority: Yup.string().required('პრიორიტეტი სავალდებულოა.'),
             status: Yup.string().required('სტატუსი სავალდებულოა.'),
             employee: Yup.string().required('თანამშრომელი სავალდებულოა.'),
@@ -79,13 +82,15 @@ export const CreateNewTask = () => {
             const formData = new FormData();
             formData.append("name", values.name);
             formData.append("description", values.description);
-            formData.append("due_date", values.due_date);
+            formData.append("due_date", new Date(values.due_date).toLocaleDateString('en-CA'));
             formData.append("status_id", values.status);
             formData.append("employee_id", values.employee);
             formData.append("priority_id", values.priority);
 
             try {
+                await api.createTask(formData);
                 console.log('Employee created');
+                navigate('/');
             } catch (error) {
                 console.error("Error creating employee", error);
             }
@@ -104,7 +109,7 @@ export const CreateNewTask = () => {
             </Container>
             <Container
                 className='bg-[#FBF9FFA6] border border-[#DDD2FF] mt-[25px] px-[55px] py-[65px] pt-10 flex-col justify-start items-start'>
-                <form className='w-[1261px] flex flex-col gap-[55px]'>
+                <form onSubmit={formik.handleSubmit} className='w-[1261px] flex flex-col gap-[55px]'>
 
                     <div className="gap-[161px] flex justify-between">
                         <Field className="flex-1">
@@ -258,16 +263,15 @@ export const CreateNewTask = () => {
                         <div className="flex-1">
                             <Field className="flex flex-col">
                                 <Label className="text-sm/6 font-medium text-[#343A40] flex">
-                                    პრიორიტეტი <Asterisk className="mt-[3px]"/>
+                                    დედლაინი <Asterisk className="mt-[3px]"/>
                                 </Label>
                                 <div className="relative w-fit ">
-                                    <Input
-                                        required={true}
-                                        name="due_date"
-                                        value={formik.values.due_date}
-                                        onChange={formik.handleChange}
-                                        onBlur={formik.handleBlur}
-                                        placeholder='DD/MM/YYYY'
+                                    <DatePicker
+                                        selected={formik.values.due_date ? new Date(formik.values.due_date) : null}
+                                        onChange={(date) => formik.setFieldValue('due_date', date)}
+                                        minDate={new Date()}
+                                        dateFormat='dd/MM/yyyy'
+                                        placeholderText='DD/MM/YYYY'
                                         className={(formik.touched.due_date && formik.errors.due_date ? "border-[#FA4D4D]" : "border-[#DEE2E6]") + ' cursor-pointer text-sm  w-[260px] rounded-[5px] border pl-[36px] p-[14px] h-[45px] appearance-none '}
                                     />
                                     <Calendar
