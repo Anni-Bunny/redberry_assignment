@@ -6,7 +6,7 @@ import {Priority} from "./Priority.ts";
 export interface Task {
     id: number;
     name: string;
-    description: string;
+    description?: string;
     due_date: string;
     department: Department;
     employee: Employee;
