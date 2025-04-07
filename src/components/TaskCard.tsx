@@ -10,7 +10,12 @@ const borderColors = ['border-[#3A86FF]', 'border-[#F7BC30]', 'border-[#FB5607]'
 
 export function TaskCard({task}: { task: Task }) {
     const formattedDate = format(new Date(task.due_date), "dd MMM, yyyy");
-    const formattedDescription = task.description?.length > 100 ? task.description.slice(0, 100) + '...' : task.description;
+    let formattedDescription
+
+    if (task.description){
+        formattedDescription = task.description?.length > 100 ? task.description?.slice(0, 100) + '...' : task.description;
+    }
+
 
     return (
         <Card className={`${borderColors[(task.status.id % borderColors.length)]}`}>
